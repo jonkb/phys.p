@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.params=m\ fixed\ coOfDiffusion\ colour
+comment0.target=Particle(double,\ boolean,\ double,\ java.awt.Color)
+comment1.params=
+comment1.target=void\ act()
+comment1.text=\r\n\ Act\ -\ do\ whatever\ the\ Particle\ wants\ to\ do.\ This\ method\ is\ called\ whenever\r\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\r\n
+comment2.params=
+comment2.target=void\ applyEM()
+comment3.params=r
+comment3.target=double\ F(double)
+comment4.params=
+comment4.target=void\ interAct()
+comment5.params=
+comment5.target=java.lang.String\ toString()
+comment6.params=
+comment6.target=Types\ type()
+numComments=7

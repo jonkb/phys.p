@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(java.lang.String[])
+comment1.params=phys
+comment1.target=void\ load(java.lang.String)
+comment1.text=\r\n\ Loads\ data\ from\ a\ file\ and\ resumes\ the\ simulation\r\n
+comment2.params=d\ F
+comment2.target=void\ loadData(Data,\ int)
+comment2.text=\r\n\ Loads\ data\ from\ a\ Data\ object\ and\ resumes\ the\ simulation\r\n
+comment3.params=phys
+comment3.target=void\ preview(java.lang.String)
+comment4.params=d
+comment4.target=void\ previewData(Data)
+comment4.text=\r\n\ Loads\ a\ table\ with\ the\ info\ stored\ in\ a\ phys\ data\ object\r\n
+comment5.params=beings
+comment5.target=Data\ exportData(java.util.ArrayList)
+numComments=6

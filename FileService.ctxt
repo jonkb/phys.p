@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.params=
+comment0.target=void\ renumber()
+comment1.params=
+comment1.target=void\ delete()
+comment2.params=prompt
+comment2.target=java.lang.String\ input(java.lang.String)
+comment3.params=prompt
+comment3.target=boolean\ confirm(java.lang.String)
+comment4.params=
+comment4.target=void\ test()
+numComments=5

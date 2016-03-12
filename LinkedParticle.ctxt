@@ -1,0 +1,16 @@
+#BlueJ class context
+comment0.params=m\ CoD\ colour
+comment0.target=LinkedParticle(double,\ double,\ java.awt.Color)
+comment1.params=
+comment1.target=void\ applyEM()
+comment2.params=r
+comment2.target=double\ F1(double)
+comment3.params=r
+comment3.target=double\ F0(double)
+comment4.params=r
+comment4.target=double\ F2(double)
+comment5.params=r
+comment5.target=double\ F3(double)
+comment6.params=r
+comment6.target=double\ F(double)
+numComments=7
