@@ -37,12 +37,10 @@ public class Particle extends Physical
             //ArrayList<Particle> particles = getParticlesInRange3(5);
             //ArrayList<Particle> particles = getAllOtherParticles();
             ArrayList<Particle> particles = getParticlesInRange(20);
-            for(int a = 0; a < particles.size(); a++)
-            {
-                Particle near = particles.get(a);
+            for(Particle near: particles){
                 double d = Math.sqrt((near.X - X)*(near.X - X)+(near.Y - Y)*(near.Y - Y));
                 assert d > 0: d;
-                double th = Math.atan2(Y-near.Y, X-near.X);//th you to me
+                double th = Math.atan2(Y-near.Y, X-near.X);//angle from you to me
                 applyForceAtCenter(F(d), th);
                 near.applyForceAtCenter(F(d), th+Math.PI);
             }
@@ -50,7 +48,7 @@ public class Particle extends Physical
     }
     protected double F(double r)
     {
-        return coOfDiffusion/r/r/r/r;
+        return coOfDiffusion/r/r;
     }
     public void interAct(){}
     public String toString()
