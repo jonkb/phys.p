@@ -235,11 +235,11 @@ MouseListener, MouseMotionListener {
         }
         
         /**
-         * For ridiculous simulations and impatient people*/
+         * For ridiculous simulations and impatient people
         if(subFrameCount % 10000 == 0){
             Date now = new Date();
             System.out.println(subFrameCount+" of "+Math.ceil(.1/world.time)+" needed. "+"time: "+now.toString());
-        }
+        }*/
         
         if(a || frameCount == endFrame)
             stop();
@@ -292,13 +292,11 @@ MouseListener, MouseMotionListener {
         
         System.out.print("Running Simulation: Precision= "+maxD+
             ": Save file= "+stem);
-        if(Execute.fileMode)
-        {
+        if(Execute.fileMode){
             recording = true;
             System.out.println(": FILE ONLY MODE");
         }
-        else
-        {
+        else{
             recording = false;
             System.out.println(": Interactive Mode");
             addKeyListener(this);

@@ -9,7 +9,7 @@ public class Sand extends Particle
 {
     public Sand()
     {
-        super(8, false, 1, Color.YELLOW);//m, fixed, cOfD, colour
+        super(8, false, 10, Color.YELLOW);//m, fixed, cOfD, colour
     }
     /*
     public void act()

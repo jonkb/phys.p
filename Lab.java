@@ -52,7 +52,7 @@ public class Lab {
         bin.add(being);
     }
     //To be called every frame
-    private void dumpBin(){
+    public void dumpBin(){
         if(bin.size() > 0){
             for(Being being: bin)
                 beings.remove(being);
@@ -85,8 +85,7 @@ public class Lab {
             return null;
     }
     
-    public Lab(Screen s)
-    {
+    public Lab(Screen s){
         screen = s;
         
         wWidth = s.Width();
@@ -104,9 +103,22 @@ public class Lab {
     }
     
     /**
+     * To be called from textInterface()
+     */
+    public Lab(int w, int h){
+        wWidth = w;
+        wHeight = h;
+        
+        beings = new ArrayList<Being>(500);
+        bin = new ArrayList<Being>();
+        
+        System.out.println("new world: w="+wWidth+"h="+wHeight);
+    }
+    
+    /**
      * Loads a pre-created simulation
      */
-    public void sim(String sim)
+    public boolean sim(String sim)
     {
         switch(sim)
         {
@@ -257,9 +269,10 @@ public class Lab {
                 }
                 break;
                 
-                default:
-                break;
+            default:
+                return false;
         }
+        return true;
     }
     
     
@@ -497,5 +510,13 @@ public class Lab {
             && being != curser)
                 removeBeing(being);    
         beings.trimToSize();//Memory optimization
+    }
+    
+    public String toString(){
+        String res = "Lab:\n";
+        for(Being being: beings){
+            res+= being + "\n";
+        }
+        return res;
     }
 }
