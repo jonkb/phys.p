@@ -356,7 +356,7 @@ MouseListener, MouseMotionListener {
         if(a)
         {
             g.setColor(Color.white);
-            g.drawString("Simulation Complete", width/ 2, height/ 2);
+            g.drawString("Simulation Complete", 10, height/ 2);
         }
         else
         {
