@@ -1,0 +1,19 @@
+#BlueJ class context
+comment0.params=
+comment0.target=BiList()
+comment1.params=
+comment1.target=int\ size()
+comment2.params=
+comment2.target=int\ sizeA()
+comment3.params=o
+comment3.target=void\ add(java.lang.Object)
+comment3.text=\r\n\ Add\ a\ being\ to\ the\ List\r\n
+comment4.params=a
+comment4.target=void\ addA(java.lang.Object)
+comment4.text=\r\n\ Add\ a\ being\ to\ the\ A-List\r\n
+comment5.params=r
+comment5.target=boolean\ remove(java.lang.Object)
+comment5.text=\r\n\ Remove\ a\ being.\ Returns\ true\ if\ the\ being\ was\ found.\r\n
+comment6.params=o
+comment6.target=boolean\ contains(java.lang.Object)
+numComments=7

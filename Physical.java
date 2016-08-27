@@ -6,8 +6,7 @@ import java.util.ArrayList;
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class Physical extends Being
-{
+public class Physical extends Being{
     public vector velocity = new vector();
     public double X;
     public double Y;
@@ -15,13 +14,11 @@ public class Physical extends Being
     public boolean fixed = false;
     
     public Physical(){}
-    public Physical(double M)
-    {
+    public Physical(double M){
         super();
         mass = M;
     }
-    public Physical(double M, boolean F)
-    {
+    public Physical(double M, boolean F){
         super();
         mass = M;
         fixed = F;
@@ -31,27 +28,23 @@ public class Physical extends Being
     {return X;}
     public double getDbY()
     {return Y;}
-    public void addedToWorld()
-    {
+    public void addedToWorld(){
         X = getX();
         Y = getY();
     }
     
-    public void setLocation(double xx, double yy)
-    {
+    public void setLocation(double xx, double yy){
         super.setLocation(xx, yy);
         X = xx;
         Y = yy;
     }
     
     
-    public ArrayList<Particle> getParticlesInRange(double r)
-    {
+    public ArrayList<Particle> getParticlesInRange(double r){
         ArrayList<Particle> inRange = new ArrayList<Particle>();
-        for(Being being: world.beings)
-        {
-            if(being != null && being instanceof Particle && being != this)
-            {
+        for(BiList.Node n = world.beings.o1; n!= null; n = n.getNext()){
+            Being being = (Being) n.getVal();
+            if(being != null && being instanceof Particle && being != this){
                 Particle part = (Particle) being;
                 double dx = part.X - X;
                 double dy = part.Y - Y;
@@ -61,13 +54,11 @@ public class Physical extends Being
         }
         return inRange;
     }
-    public ArrayList<Particle> getAllOtherParticles()
-    {
+    public ArrayList<Particle> getAllOtherParticles(){
         ArrayList<Particle> parts = new ArrayList<Particle>();
-        for(Being being: world.beings)
-        {
-            if(being != null && being instanceof Particle && being != this)
-            {
+        for(BiList.Node n = world.beings.o1; n!= null; n = n.getNext()){
+            Being being = (Being) n.getVal();
+            if(being != null && being instanceof Particle && being != this){
                 Particle part = (Particle) being;
                 parts.add(part);
             }
@@ -75,28 +66,22 @@ public class Physical extends Being
         return parts;
     }
     
-    
-    public void accelerate(vector a)
-    {
-        if(!fixed)
-        {
+    public void accelerate(vector a){
+        if(!fixed){
             assert world.time != 0;
             assert vector.scalMult(a, world.time).Mag() < 999999999: world.time;
             velocity.addOn(vector.scalMult(a, world.time));
         }
     }
-    public void accelerate(double magnitude, double direction)
-    {
-        if(!fixed)
-        {
+    public void accelerate(double magnitude, double direction){
+        if(!fixed){
             assert world.time != 0;
             vector v = new vector(magnitude*world.time, direction);
             assert v.Mag() < 1000000000.: v.Mag();
             velocity.addOn(v);//a=dv/t dv = at
         }
     }
-    public void applyForceAtCenter(double magnitude, double direction)
-    {   //F=ma a=F/m
+    public void applyForceAtCenter(double magnitude, double direction){   //F=ma a=F/m
         accelerate(magnitude / mass, direction);
     }
     
@@ -112,10 +97,9 @@ public class Physical extends Being
                 accelerate(velocity.Mag()/6, velocity.Dir()+ Math.PI);
         }
     }
-    protected void applyGravity()
-    {accelerate(world.getGravityV());}
-    protected void move()
-    {
+    protected void applyGravity(){
+        accelerate(world.getGravityV());}
+    protected void move(){
         //System.out.println(this+"X="+X+";   Y="+Y+";   V="+velocity.Mag()+" @"+180*velocity.Dir()/Math.PI+"deg");
         assert world.time != 0;//v=x/t x = vt
         X += world.time*velocity.Mag()*Math.cos(velocity.Dir()); //System.out.println(this+"dx="+world.time*velocity.Mag()*Math.cos(velocity.Dir()));
@@ -143,8 +127,7 @@ public class Physical extends Being
         x = (int) Math.round(X);
         y = (int) Math.round(Y);*/
     }
-    public void print()
-    {
+    public void print(){
         setLocation(X, Y);
     }
 }

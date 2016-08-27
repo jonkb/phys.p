@@ -1,28 +1,24 @@
-import java.util.ArrayList;
 public class Data implements java.io.Serializable
 {
     double precision;
     double zoom;
     String saveFile;
     pData[] particles;
-    public Data(double pre, double z, String saveF, ArrayList<Being> b)
-    {
+    public Data(double pre, double z, String saveF, BiList<Being> b){
         precision = pre;
         zoom = z;
         saveFile = saveF;
         particles = new pData[b.size()];
         int i = 0;
-        for(Being be: b)
-        {
-            if(be instanceof Particle)
-            {
+        for(BiList.Node n = b.o1; n != null; n = n.getNext()){
+            Being be = (Being) n.getVal();
+            if(be instanceof Particle){
                 particles[i] = new pData((Particle) be);
                 i++;
             }
         }
     }
-    public class pData implements java.io.Serializable
-    {
+    public class pData implements java.io.Serializable{
         double X;
         double Y;
         vector velocity;

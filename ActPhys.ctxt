@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.params=b\ v
+comment0.target=ActPhys(Being,\ int)
+comment0.text=\r\n\ Make\ a\ new\ ActPhys\ Runnable\ of\ type\ act\ or\ updateXY\r\n\ v(0)\ \=\ act();\r\n\ v(1)\ \=\ updateXY();\r\n
+comment1.params=
+comment1.target=void\ run()
+numComments=2

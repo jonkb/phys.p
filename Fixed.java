@@ -12,14 +12,14 @@ public class Fixed extends Particle
     }
     public void print(){}
     public void act(){}
-    public static void create(Lab world, int x,int y,int w,int h)
-    {   //Just a quick print void
+    //Just a quick print void
+    public static void create(Lab world, int x,int y,int w,int h){   
         for(int a = 0; a < w ; a++)
         {
             for(int b = 0; b < h ; b++)
             {
                 Particle particle = new Fixed();
-                world.addBeing(particle, x + a, y + b);
+                world.addPhys(particle, x + a, y + b);
             }
         }
     }

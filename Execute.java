@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 public class Execute{
     static Screen screen;
+    public static long t0;
+    //0: just a few messages 1:a few each frame 2: lots
+    public static int debugging = 2;
     
     //Execution Options:
     public static boolean 
@@ -23,6 +26,11 @@ public class Execute{
     
     
     public static void main(String[] args){
+        if(args.length > 0)
+            debugging = Integer.parseInt(args[0]);
+        t0 = System.currentTimeMillis();
+        System.gc();
+        
         if( SIM.equals(""))
             saveFile = "Tests/"+simNum+".";
         
@@ -163,13 +171,10 @@ public class Execute{
         }
     }
     
-    public static Data exportData(ArrayList<Being> beings)
-    {
+    public static Data exportData(BiList<Being> beings){
         Data d = new Data(precision, zoom, saveFile, beings);
         return d;
     }
-    
-    
     
     
     
@@ -318,7 +323,8 @@ public class Execute{
                 //Have at least .001/maxD subframes. prevents a jumpy first frame
                 double maxV = .001;
                 //Find the biggest V
-                for(Being being: world.beings){
+                for(BiList.Node n = world.beings.o1; n!= null; n = n.getNext()){
+                    Being being = (Being) n.getVal();
                     if(being instanceof Physical){
                         Physical phys = (Physical) being;
                         if(Math.abs(phys.velocity.Mag()) > maxV)
@@ -333,10 +339,12 @@ public class Execute{
                 assert world.time > 0;
                 
                 
-                for(Being being: world.beings){
+                for(BiList.Node n = world.beings.o1; n!= null; n = n.getNext()){
+                    Being being = (Being) n.getVal();
                     being.act();
                 }
-                for(Being being: world.beings){
+                for(BiList.Node n = world.beings.o1; n!= null; n = n.getNext()){
+                    Being being = (Being) n.getVal();
                     being.updateXY();//move
                 }
                 world.dumpBin();//Replaces world.act()
