@@ -9,6 +9,8 @@ public class Execute{
     public static long t0;
     //0: just a few messages 1:a few each frame 2: lots
     public static int debugging = 2;
+    //How much multithreading? 0:Mono 1: max 4 2: max 64 3: unlimited
+    public static int mt_mode = 0;
     
     //Execution Options:
     public static boolean 
@@ -19,15 +21,23 @@ public class Execute{
         simNum = 24;
     private static double
         precision = .1,//.00000005;
-        zoom = 2;
+        zoom = 1;
     private static String 
-        SIM = "",//"SandFall",
+        SIM = "SandFall",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     
     public static void main(String[] args){
-        if(args.length > 0)
-            debugging = Integer.parseInt(args[0]);
+        switch(args.length){
+            case 4:
+                SIM = args[3];
+            case 3:
+                mt_mode = Integer.parseInt(args[2]);
+            case 2:
+                zoom = Integer.parseInt(args[1]);
+            case 1:
+                debugging = Integer.parseInt(args[0]);
+        }
         t0 = System.currentTimeMillis();
         System.gc();
         

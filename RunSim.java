@@ -52,7 +52,14 @@ public class RunSim implements Runnable{
         
         debugShout("Starting the main loop now");
         try{
-            loop();
+            switch(Execute.mt_mode){
+                case 0://single thread
+                    loop_mono();
+                break;
+                case 3://unlimited threads
+                    loop();
+                break;
+            }
         }catch(Exception e){
             System.out.println("Exception at "+System.currentTimeMillis()+": "+e);
             throw e;
@@ -145,24 +152,74 @@ public class RunSim implements Runnable{
                     mamma.subFrameCount = 0;
                 }
             }
+        }
+    }
+    private void loop_mono(){
+        while(!end){
+            //Needed for keyboard input
+            if (!mamma.onScreen)
+                mamma.requestFocusInWindow();
             
-            /*
-            // By invoking this later, it actually works. 
-            // Repaint() must be called from EDT
-            // Try switching it to a "synchronous" method of screen
-            SwingUtilities.invokeLater(new Runnable(){
-                public void run(){
-                    //Everything needs to be in place before it is drawn on the canvas
-                    for(Thread t = acting.poll(); t!= null; t = acting.poll()){
-                        try{
-                            t.join();
-                        }catch(Exception e){System.out.println(e);}
+            if(paused){
+                mamma.world.act();
+                mamma.rps();
+                try{
+                    Thread.sleep(rate);
+                }catch(Exception e){System.out.println(e);}
+            }
+            else{
+                mamma.subFrameCount++;
+                /**
+                 * This next section adjusts the number of steps per frame
+                 * Movement is resolved many times per frame so that 
+                 *   particles do not pass through each other
+                 * Number of subframes = MaxV*10
+                 */
+                //Have at least .001/maxD subframes. prevents a jumpy first frame
+                double maxV = .001;
+                //Find the biggest V
+                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
+                    Being being = (Being) n.getVal();
+                    if(being instanceof Physical){
+                        Physical phys = (Physical) being;
+                        if(Math.abs(phys.velocity.Mag()) > maxV)
+                            maxV = Math.abs(phys.velocity.Mag());
                     }
-                    mamma.repaint();
-                    if(mamma.recording)
-                        mamma.snap();
                 }
-            });*/
+                if(maxV/mamma.maxD > 1)//more than one subframe required
+                    mamma.world.time = mamma.maxD/maxV;
+                else
+                    mamma.world.time = 1;
+                assert mamma.world.time > 0;
+                
+                reportMem("A");
+                //act
+                mamma.world.act();
+                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
+                    Being being = (Being) n.getVal();
+                    being.act();
+                }
+                //updateXY
+                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
+                    Being being = (Being) n.getVal();
+                    being.updateXY();
+                }
+                debugShout("Subframe: "+mamma.subFrameCount+" of "+Math.ceil(1/mamma.world.time));
+                //Frame
+                if(mamma.subFrameCount >= 1/mamma.world.time){
+                    mamma.frameCount++;
+                    String f = "Frame: "+mamma.frameCount;
+                    if(paused)
+                        debugShout(f+": paused", 3);
+                    else
+                        debugShout(f);
+                    mamma.rps();
+                    try{
+                        Thread.sleep(rate);
+                    }catch(Exception e){System.out.println(e);}
+                    mamma.subFrameCount = 0;
+                }
+            }
         }
     }
     
