@@ -251,21 +251,19 @@ public class Lab{
                 }
                 break;
             case "SandFall":
-                for(int a = 200; a < 210; a++)
-                    for(int b = 200; b < 210; b++)
-                    {
+                for(int a = 100; a < 110; a++)
+                    for(int b = 100; b < 110; b++){
                         //Large Square
                         addPhys(new Sand(), a, b, true);
-                        //Small Dense square underneith
-                        addPhys(new Fixed(), 203 + (a-200)/3, 213 + (b-200)/3, false);//303-306
+                        //Small Dense square underneath
+                        addPhys(new Fixed(), 103 + (a-100)/3, 113 + (b-100)/3, false);//303-306
                     }
                 break;
             case "TinyBridge":
                 /**
                  * Build the Bridge
                  */
-                for(int a = 10; a < 20; a++)
-                {
+                for(int a = 10; a < 20; a++){
                     //Make three(four)-layer plank from 70 to 79
                     if(a != 10)
                         addPhys(new Brick(), a, 10, true);
@@ -289,32 +287,33 @@ public class Lab{
      */
     public void act()
     {
-        //This way, when curser is the only thing, life is easier
-        curser.act();
-        
         assert time > 0;
-        int d = screen.getScroll();
-        if(!shiftDown)
-            curserH -= d;
-        if(!ctrlDown)
-            curserW -= d;
-        if(shiftDown && ctrlDown)
-        {
-            curserW -= d;
-            curserH = curserW;
+        if(!Execute.fileMode){
+            //This way, when curser is the only thing, life is easier
+            curser.act();
+            
+            int d = screen.getScroll();
+            if(!shiftDown)
+                curserH -= d;
+            if(!ctrlDown)
+                curserW -= d;
+            if(shiftDown && ctrlDown)
+            {
+                curserW -= d;
+                curserH = curserW;
+            }
+            /**
+             * Ensure that neither height nor width is out of bounds
+             */
+            if(curserH < 1)
+                curserH = 1;
+            else if(curserH > wHeight)
+                curserH = wHeight;
+            if(curserW < 1)
+                curserW = 1;
+            else if(curserW > wWidth)
+                curserW = wWidth;
         }
-        /**
-         * Ensure that neither height nor width is out of bounds
-         */
-        if(curserH < 1)
-            curserH = 1;
-        else if(curserH > wHeight)
-            curserH = wHeight;
-        if(curserW < 1)
-            curserW = 1;
-        else if(curserW > wWidth)
-            curserW = wWidth;
-        
         dumpBin();
     }
     

@@ -14,19 +14,22 @@ public class Execute{
     
     //Execution Options:
     public static boolean 
-        fileMode = false,
-        keepPre = false;
+        fileMode = true,
+        keepPre = false; // When loading a file, keep the precision
     private static int 
         endF = 1000000,
-        simNum = 24;
+        simNum = 01;
     private static double
         precision = .1,//.00000005;
         zoom = 1;
     private static String 
-        SIM = "",//"SandFall",
+        SIM = "SandFall",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
-    
+    /**
+     * CL: >> Execute debugging zoom max_threads SIM
+     * Example: java Execute 0 2 512 SandFall
+     */
     public static void main(String[] args){
         switch(args.length){
             case 4:

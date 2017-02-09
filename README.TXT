@@ -21,7 +21,7 @@ The block [-Xss64k] specifies the stack size of a thread.
 If you use unlimited multithreading (mt_mode = 3), specify this 
     (the default is 1m)
 debugging: 0: just a few messages 1:a few each frame 2: lots
-mt_mode: How much multithreading? 0:Mono 1: max 4 2: max 64 3: unlimited
+max_threads: How much multithreading? 0:Unlimited   else:specify number
 SIM: preset
 
 AUTHORS:                    Jonathan Black

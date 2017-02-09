@@ -197,8 +197,14 @@ MouseListener, MouseMotionListener {
         //Start loop
     }
     
-    /**
-     * Constructor
+    /**Constructor
+     * endF: Frame at which to end the simulation
+     * precision: dt for Euler approximation
+     * saveFile: place to save images and .phys data
+     * SIM: name of a simulation to load automatically
+     * zoom: zoom factor
+     * start: whether or not to start automatically. 
+     *      If this is false, start() should be called externally
      */
     public Screen(int endF, double precision, String saveFile, String SIM, double zoom, boolean start){
         endFrame = endF;
