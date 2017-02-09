@@ -52,14 +52,7 @@ public class RunSim implements Runnable{
         
         debugShout("Starting the main loop now");
         try{
-            switch(Execute.mt_mode){
-                case 0://single thread
-                    loop_mono();
-                break;
-                case 3://unlimited threads
-                    loop();
-                break;
-            }
+            loop();
         }catch(Exception e){
             System.out.println("Exception at "+System.currentTimeMillis()+": "+e);
             throw e;
@@ -71,7 +64,6 @@ public class RunSim implements Runnable{
             //Needed for keyboard input
             if (!mamma.onScreen)
                 mamma.requestFocusInWindow();
-            
             if(paused){
                 mamma.world.act();
                 mamma.rps();
@@ -106,29 +98,58 @@ public class RunSim implements Runnable{
                 
                 reportMem("A");
                 /* New version implementing massive multithreading
+                 * Also new, put a couple beings on each thread
                  */
                 //act
                 mamma.world.act();
+                
+                int actors_per_thread = 1;
+                if(Execute.max_threads > 0) // 0 means unlimited
+                    actors_per_thread = (int) Math.ceil( mamma.world.beings.sizeA() / (double) Execute.max_threads);
+                Being[] next = new Being[actors_per_thread];
+                int next_size = 0;
+                
                 for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
                     Being being = (Being) n.getVal();
-                    ActPhys a = new ActPhys(being, 0);
-                    Thread t = new Thread(a);
-                    acting.add(t);
-                    t.start();
+                    next[next_size] = being;
+                    next_size++;
+                    
+                    if(next_size >= actors_per_thread){
+                        ActPhys a = new ActPhys(next, 0);
+                        Thread t = new Thread(a);
+                        acting.add(t);
+                        t.start();
+                        //This should work
+                        next = new Being[actors_per_thread];
+                        next_size = 0;
+                    }
                 }
                 reportMem("B");
+                //poll() retrieves & removes
                 for(Thread t = acting.poll(); t!= null; t = acting.poll()){
                     try{
-                        t.join();
+                        t.join();//"Waits for this thread to die"
                     }catch(Exception e){System.out.println(e);}
                 }
                 //updateXY
+                
+                next = new Being[actors_per_thread];
+                next_size = 0;
+                
                 for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
                     Being being = (Being) n.getVal();
-                    ActPhys a = new ActPhys(being, 1);
-                    Thread t = new Thread(a);
-                    acting.add(t);
-                    t.start();
+                    next[next_size] = being;
+                    next_size++;
+                    
+                    if(next_size >= actors_per_thread){
+                        ActPhys a = new ActPhys(next, 1);
+                        Thread t = new Thread(a);
+                        acting.add(t);
+                        t.start();
+                        //This should work - hopefully
+                        next = new Being[actors_per_thread];
+                        next_size = 0;
+                    }
                 }
                 for(Thread t = acting.poll(); t!= null; t = acting.poll()){
                     try{
@@ -154,77 +175,10 @@ public class RunSim implements Runnable{
             }
         }
     }
-    private void loop_mono(){
-        while(!end){
-            //Needed for keyboard input
-            if (!mamma.onScreen)
-                mamma.requestFocusInWindow();
-            
-            if(paused){
-                mamma.world.act();
-                mamma.rps();
-                try{
-                    Thread.sleep(rate);
-                }catch(Exception e){System.out.println(e);}
-            }
-            else{
-                mamma.subFrameCount++;
-                /**
-                 * This next section adjusts the number of steps per frame
-                 * Movement is resolved many times per frame so that 
-                 *   particles do not pass through each other
-                 * Number of subframes = MaxV*10
-                 */
-                //Have at least .001/maxD subframes. prevents a jumpy first frame
-                double maxV = .001;
-                //Find the biggest V
-                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
-                    Being being = (Being) n.getVal();
-                    if(being instanceof Physical){
-                        Physical phys = (Physical) being;
-                        if(Math.abs(phys.velocity.Mag()) > maxV)
-                            maxV = Math.abs(phys.velocity.Mag());
-                    }
-                }
-                if(maxV/mamma.maxD > 1)//more than one subframe required
-                    mamma.world.time = mamma.maxD/maxV;
-                else
-                    mamma.world.time = 1;
-                assert mamma.world.time > 0;
-                
-                reportMem("A");
-                //act
-                mamma.world.act();
-                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
-                    Being being = (Being) n.getVal();
-                    being.act();
-                }
-                //updateXY
-                for(BiList.Node n = mamma.world.beings.a1; n != null; n = n.getNextA()){
-                    Being being = (Being) n.getVal();
-                    being.updateXY();
-                }
-                debugShout("Subframe: "+mamma.subFrameCount+" of "+Math.ceil(1/mamma.world.time));
-                //Frame
-                if(mamma.subFrameCount >= 1/mamma.world.time){
-                    mamma.frameCount++;
-                    String f = "Frame: "+mamma.frameCount;
-                    if(paused)
-                        debugShout(f+": paused", 3);
-                    else
-                        debugShout(f);
-                    mamma.rps();
-                    try{
-                        Thread.sleep(rate);
-                    }catch(Exception e){System.out.println(e);}
-                    mamma.subFrameCount = 0;
-                }
-            }
-        }
-    }
     
     public static void reportMem(String tag){
-        debugShout("Heap memory at "+tag+"(f/t/m):"+(Runtime.getRuntime().freeMemory() / 1000)+"k/"+(Runtime.getRuntime().totalMemory() / 1000)+"k/"+(Runtime.getRuntime().maxMemory() / 1000)+"k", 3);
+        debugShout("Heap memory at "+tag+"(f/t/m):"+(Runtime.getRuntime().freeMemory() / 1000)+"k/"
+            +(Runtime.getRuntime().totalMemory() / 1000)+"k/"+(Runtime.getRuntime().maxMemory() / 1000)+"k", 3);
     }
     public static void debugShout(String message){
         Screen.debugShout(message);

@@ -200,8 +200,7 @@ MouseListener, MouseMotionListener {
     /**
      * Constructor
      */
-    public Screen(int endF, double precision, String saveFile, String SIM, double zoom, boolean start)
-    {
+    public Screen(int endF, double precision, String saveFile, String SIM, double zoom, boolean start){
         endFrame = endF;
         maxD = precision;
         stem = saveFile;
@@ -237,8 +236,7 @@ MouseListener, MouseMotionListener {
     }
     
     
-    public void lose()
-    {
+    public void lose(){
         a = true;
         repaint();
         

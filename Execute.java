@@ -7,10 +7,10 @@ import java.util.Scanner;
 public class Execute{
     static Screen screen;
     public static long t0;
-    //0: just a few messages 1:a few each frame 2: lots
+    //0: just a few messages 1:a few each frame 2: lots 3:stupid lots
     public static int debugging = 2;
-    //How much multithreading? 0:Mono 1: max 4 2: max 64 3: unlimited
-    public static int mt_mode = 0;
+    //How much multithreading? 0: unlimited ; more: max that many
+    public static int max_threads = 256;
     
     //Execution Options:
     public static boolean 
@@ -23,7 +23,7 @@ public class Execute{
         precision = .1,//.00000005;
         zoom = 1;
     private static String 
-        SIM = "SandFall",//"SandFall",
+        SIM = "",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     
@@ -32,7 +32,7 @@ public class Execute{
             case 4:
                 SIM = args[3];
             case 3:
-                mt_mode = Integer.parseInt(args[2]);
+                max_threads = Integer.parseInt(args[2]);
             case 2:
                 zoom = Integer.parseInt(args[1]);
             case 1:
