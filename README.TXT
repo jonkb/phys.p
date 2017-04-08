@@ -15,16 +15,29 @@ VERSION or DATE:            Fall 2015
 HOW TO START THIS PROJECT:  Execute.main({});
 
 from command line, the syntax is as follows:
-java [-Xss64k] Execute [debugging [zoom [mt_mode [SIM]]]]
+java [-Xss64k] Execute [options]
+Example: java Execute d0 z2 t512 sSandFall
+
+Options: tag followed by value
+    h - help
+    l[file] - load
+    v[file] - preview
+    d# - debugging 
+    z# - zoom 
+    p# - precision 
+    t# - max_threads 
+    n# - simNum 
+    s[str] - SIM
 
 The block [-Xss64k] specifies the stack size of a thread.
-If you use unlimited multithreading (mt_mode = 3), specify this 
-    (the default is 1m)
+If you use unlimited multithreading (mt_mode = 0), specify this 
+    (the default is 1m (1mb))
 debugging: 0: just a few messages 1:a few each frame 2: lots
 max_threads: How much multithreading? 0:Unlimited   else:specify number
+
 SIM: preset
 
-AUTHORS:                    Jonathan Black
+AUTHORS:    Jonathan Black
 
 USER INSTRUCTIONS:
 
@@ -48,7 +61,6 @@ USER INSTRUCTIONS:
 TO ADD:
 
     Zoom Window
-    File only mode - No display
     Time Resolution in frames per second (Based on gravity)
     Fix Removing with different curser shapes
-    Multithreading for core utilization.
+    When zooming, make particle images bigger

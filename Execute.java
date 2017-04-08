@@ -8,46 +8,104 @@ public class Execute{
     static Screen screen;
     public static long t0;
     //0: just a few messages 1:a few each frame 2: lots 3:stupid lots
-    public static int debugging = 2;
+    public static int debugging = 1;
     //How much multithreading? 0: unlimited ; more: max that many
-    public static int max_threads = 256;
+    public static int max_threads = 1;
     
     //Execution Options:
     public static boolean 
         fileMode = true,
-        keepPre = false; // When loading a file, keep the precision
+        loadPre = false, // When loading a file, load the precision too
+        stepWise = false; // Pause & ask for confirmation after each frame & 100 000 subframes
     private static int 
         endF = 1000000,
-        simNum = 01;
+        simNum = 1;
     private static double
-        precision = .1,//.00000005;
+        precision = 1e-5,//.00000005;
         zoom = 1;
     private static String 
         SIM = "SandFall",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     /**
-     * CL: >> Execute debugging zoom max_threads SIM
-     * Example: java Execute 0 2 512 SandFall
+     * h - help
+     * hsim - list sims
+     * l[] - load
+     * v[] - preView
+     * d# - debugging 
+     * z# - zoom 
+     * p# - precision 
+     * pl - load precision (use with l[])
+     * t# - max_threads 
+     * n# - simNum 
+     * e# - endF
+     * s[] - SIM
+     * i - interactive mode
+     * istep - stepwise mode
+     * Example: java Execute d0 z2 t512 sSandFall
      */
     public static void main(String[] args){
-        switch(args.length){
-            case 4:
-                SIM = args[3];
-            case 3:
-                max_threads = Integer.parseInt(args[2]);
-            case 2:
-                zoom = Integer.parseInt(args[1]);
-            case 1:
-                debugging = Integer.parseInt(args[0]);
+        for(String s: args){
+            String tag = s.substring(0,1);
+            String body = s.substring(1);
+            switch(tag){
+                case "h":
+                    //Help
+                    help(body);
+                    return;
+                case "l":
+                    //load
+                    load(body);
+                    return;
+                case "v":
+                    //preview
+                    preview(body);
+                    return;
+                case "d":
+                    debugging = Integer.parseInt(body);
+                    break;
+                case "z":
+                    zoom = Integer.parseInt(body);
+                    break;
+                case "p":
+                    if(body.equals("l"))
+                        loadPre = true;
+                    else
+                        precision = Double.parseDouble(body);
+                    break;
+                case "i":
+                    switch(body){
+                        case "":
+                            fileMode = false;
+                            break;
+                        case "step":
+                        case "s":
+                            stepWise = true;
+                    }
+                    break;
+                case "t":
+                    max_threads = Integer.parseInt(body);
+                    break;
+                case "n":
+                    simNum = Integer.parseInt(body);
+                    break;
+                case "e":
+                    endF = Integer.parseInt(body);
+                    break;
+                case "s":
+                    SIM = body;
+                    break;
+            }
         }
+        saveFile = "Tests/"+SIM+"/"+simNum+".";
         t0 = System.currentTimeMillis();
         System.gc();
+        screen = new Screen(endF, precision, saveFile, SIM, zoom, true);
         
+        saveFile = "Tests/"+SIM+"/"+simNum+".";
         if( SIM.equals(""))
             saveFile = "Tests/"+simNum+".";
         
-        screen = new Screen(endF, precision, saveFile, SIM, zoom, true);
         if(!fileMode){
             JFrame frame = new JFrame("Particles");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,24 +115,71 @@ public class Execute{
             frame.setVisible(true);
         }
     }
+    //Print a help message for the CLI
+    private static void help(String body){
+        switch(body){
+            case "":
+            case "elp":
+                System.out.println("Each option for phys.p is specified with a one character tag that may be followed by some modifier or argument.");
+                System.out.println("Options:");
+                System.out.println("\td# - debugging");
+                System.out.println("\tz# - zoom");
+                System.out.println("\tp# - precision");
+                System.out.println("\tpl - load precision (use with l[])");
+                System.out.println("\ti - interactive mode");
+                System.out.println("\tistep - stepwise mode");
+                System.out.println("\tt# - threads");
+                System.out.println("\tn# - sim number. Shows up in file names.");
+                System.out.println("\te# - end frame");
+                System.out.println("\ts[string] - SIM name for loading an automatic sim");
+                System.out.println("Other Commands:");
+                System.out.println("\th - help");
+                System.out.println("\th[option] - help for a particular option (not all listed)");
+                System.out.println("\tl[file] - load and continue .phys");
+                System.out.println("\tv[file] - load and preview .phys");
+                break;
+            case "s":
+            case "elpsim":
+            case "elpsims":
+            case "sim":
+            case "sims":
+                System.out.println("SIMS:");
+                System.out.println("Beaker, Bridge, noGrav, Rubber, SuBridge, Brick, SandFall, "
+                    +"TinyBridge, Pulley");
+                System.out.println("Recommended Zoom:");
+                System.out.println("\tTinyBridge: 20 (16-30)");
+                System.out.println("\tSuBridge: 8 (5-9)");
+                System.out.println("\tSandFall: 3");
+                System.out.println("\tPulley: 8");
+                break;
+            case "d"://Help with the "d" option
+            case "d#":
+                System.out.println("This option specifies the depth of debugging, A.K.A. how many messages appear during the simulation.");
+                System.out.println("\t0: just a few messages");
+                System.out.println("\t1: a few each frame");
+                System.out.println("\t2: lots");
+                System.out.println("\t3: stupid lots");
+        }
+    }
+    
     /**
      * Loads data from a file and resumes the simulation
      */
     public static void load(String phys){
+        t0 = System.currentTimeMillis();
+        System.gc();
+        screen = new Screen(endF, precision, saveFile, SIM, zoom, false);
+        
         File f = new File(phys);
         //If it is a .phys file
-        if(f.getName().substring(f.getName().lastIndexOf(".")).equals(".phys"))
-        {
-            try
-            {
+        if(f.getName().substring(f.getName().lastIndexOf(".")).equals(".phys")){
+            try{
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
                 Data d = (Data) ois.readObject();
                 ois.close();
                 System.out.println("Loading "+f.getName());
-                String[] pieces = phys.split("\\.");
-                assert pieces.length > 2: phys;
-                int F= Integer.parseInt(pieces[pieces.length-2]);
-                loadData(d, F);
+                loadData(d);
+                screen.start();
             }
             catch(Exception e)
             {
@@ -84,16 +189,37 @@ public class Execute{
         else
             System.out.println("Error- Not proper .phys file");
     }
-    /**
-     * Loads data from a Data object and resumes the simulation
-     */
-    private static void loadData(Data d, int F){
-        assert d!= null: d;
-        if(keepPre){
-            precision = d.precision;
+    /*public static void loadOld(String phys){
+        File f = new File(phys);
+        //If it is a .phys file
+        if(f.getName().substring(f.getName().lastIndexOf(".")).equals(".phys")){
+            try{
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+                oldData od = (oldData) ois.readObject();
+                ois.close();
+                Data d2 = new Data(999, 100000, od);
+                System.out.println("Loading "+f.getName());
+                loadData(d2);
+                screen.start();
+            }
+            catch(Exception e){
+                System.out.println("E: "+e);
+            }
         }
+        else
+            System.out.println("Error- Not proper .phys file");
+    }*/
+    /**
+     * Loads data from a Data object
+     */
+    private static void loadData(Data d){
+        assert d!= null: d;
+        if(loadPre)
+            precision = d.precision;
         zoom = d.zoom;
         saveFile = d.saveFile;
+        screen.frameCount = d.frame;
+        screen.subFrameCount = d.subframe;
         SIM = "";
         
         assert d.particles != null: d.particles;
@@ -101,7 +227,6 @@ public class Execute{
         //+" starting with "+d.particles[0]+": a "+d.particles[0].type
         //+" @ x= "+d.particles[0].X);
         screen = new Screen(endF, precision, saveFile, SIM, zoom, false);
-        screen.frameCount = F;
         for(Data.pData pd: d.particles) {
             assert pd != null;
             assert pd.type != null;
@@ -138,8 +263,7 @@ public class Execute{
             screen.world.addPart(p);
         }
         
-        if(!fileMode)
-        {
+        if(!fileMode){
             JFrame frame = new JFrame("Particles");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
@@ -147,9 +271,12 @@ public class Execute{
             frame.pack();
             frame.setVisible(true);
         }
-        screen.start();
     }
     public static void preview(String phys){
+        t0 = System.currentTimeMillis();
+        System.gc();
+        screen = new Screen(endF, precision, saveFile, SIM, zoom, false);
+        
         File f = new File(phys);
         //If it is a .phys file
         if(f.getName().substring(f.getName().lastIndexOf(".")).equals(".phys")){
@@ -158,7 +285,9 @@ public class Execute{
                 Data d = (Data) ois.readObject();
                 ois.close();
                 System.out.println("Loading "+f.getName());
-                previewData(d);
+                /* ~~~~~~~ */
+                //previewData(d);
+                previewDataImg(d);
             }
             catch(Exception e){
                 System.out.println("E: "+e);
@@ -167,6 +296,16 @@ public class Execute{
         else
             System.out.println("Error- Not proper .phys file");
     }
+    //Specific case right now
+    public static void preview_from_output(String out){
+        t0 = System.currentTimeMillis();
+        System.gc();
+        screen = new Screen(endF, precision, saveFile, SIM, zoom, true);
+        Data d = FileService.parseOutput_to_data("Tests/Pulley/2.temp.txt");
+        System.out.println("Loading "+out);
+        previewData(d);
+        previewDataImg(d);
+    }
     /**
      * Loads a table with the info stored in a phys data object
      */
@@ -174,7 +313,6 @@ public class Execute{
         assert d!= null: d;
         assert d.particles != null: d.particles;
         System.out.println("loading "+d.particles.length+ " particles");
-        
         for(Data.pData pd: d.particles) {
             assert pd != null;
             assert pd.type != null;
@@ -183,9 +321,14 @@ public class Execute{
                 "\twith V="+pd.velocity.Mag()+"\t@ "+pd.velocity.Dir());
         }
     }
-    
-    public static Data exportData(BiList<Being> beings){
-        Data d = new Data(precision, zoom, saveFile, beings);
+    private static void previewDataImg(Data d){
+        loadData(d);
+        //screen.run = new RunSim(screen);
+        screen.snap("temp", false);
+    }
+    //Called by Screen
+    public static Data exportData(BiList<Being> beings, int frameCount, int subFrameCount){
+        Data d = new Data(frameCount, subFrameCount, precision, zoom, saveFile, beings);
         return d;
     }
     
@@ -194,6 +337,7 @@ public class Execute{
     /**
      * The rest is for interfacing with the simulator through CLI
      */
+    
     public static void textInterface(){
         System.out.println("Running Simulation:");
         //String res = prompt("Screen Dimensions? (w,h)");

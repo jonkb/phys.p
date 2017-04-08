@@ -12,6 +12,14 @@ public class Lab{
     static double time = 1;
     
     private final boolean walls = true;
+    /* Let gravity = 10m/s^2
+     * Let 1s = 20f
+     * let 1m = n*c
+     * 10 m  | n*c | 1s ^ 2     = n/40 c/f^2 --> n = 40
+     * 1 s^2 | 1m   | 20f ^ 2
+     *    assuming g = 10m/s^2
+     *    &fps = 20, 40c = 1m
+     */
     private int gravity = 1;
     private vector gravityV = new vector(1.0, Math.PI/2);
     public final boolean air = true;
@@ -107,9 +115,10 @@ public class Lab{
         bin = new LinkedList<Being>();
         
         curser = new Curser();
-        if(!Execute.fileMode)
+        if(!Execute.fileMode){
             addBeing(curser, wWidth/2, wHeight/2, false);
-        curserType = Types.SAND;
+            curserType = Types.SAND;
+        }
         
         System.out.println("new world: w="+wWidth+"h="+wHeight);
     }
@@ -131,8 +140,7 @@ public class Lab{
      * Loads a pre-created simulation
      */
     public boolean sim(String sim){
-        switch(sim)
-        {
+        switch(sim){
             case "Beaker":
                 /**
                  * Build a beaker
@@ -193,39 +201,42 @@ public class Lab{
                 /**
                  * Build a suspension Bridge
                  */
-                for(int a = 300; a < 360; a++)
-                {
+                int x0 = 20;
+                int y0 = 40;
+                int length = 60;
+                int rope_length = 12;
+                for(int a = x0; a < x0+length; a++){
                     //Make four-layer plank from 300 to 359
-                    addPhys(new Brick(), a, 300, true);
-                    addPhys(new Brick(), a+.5, 300 + Math.sqrt(3)/2, true);
-                    addPhys(new Brick(), a, 300 + Math.sqrt(3), true);
-                    addPhys(new Brick(), a+.5, 300 + 3*Math.sqrt(3)/2, true);
+                    addPhys(new Brick(), a, y0, true);
+                    addPhys(new Brick(), a+.5, y0 + Math.sqrt(3)/2, true);
+                    addPhys(new Brick(), a, y0 + Math.sqrt(3), true);
+                    addPhys(new Brick(), a+.5, y0 + 3*Math.sqrt(3)/2, true);
                     //Make two triple-layer, double density platforms
-                    /*
-                    if(a < 310 || a > 349)
-                    {
-                        addPhys(new Fixed(), a-.25, 304.8);
-                        addPhys(new Fixed(), a-.25, 305.3);
-                        addPhys(new Fixed(), a-.25, 305.8);
-                        addPhys(new Fixed(), a+.25, 304.8);
-                        addPhys(new Fixed(), a+.25, 305.3);
-                        addPhys(new Fixed(), a+.25, 305.8);
-                    }*/
+                    if(a < (x0+10) || a > (x0+length-11)){
+                        addPhys(new Fixed(), a-.25, y0+4.8);
+                        addPhys(new Fixed(), a-.25, y0+5.3);
+                        addPhys(new Fixed(), a-.25, y0+5.8);
+                        addPhys(new Fixed(), a+.25, y0+4.8);
+                        addPhys(new Fixed(), a+.25, y0+5.3);
+                        addPhys(new Fixed(), a+.25, y0+5.8);
+                    }
                     //Make two vertical ropes
-                    if(a < 330)
-                        addPhys(new Brick(), 320.5, a-29-Math.sqrt(3)/2, true); 
-                    else
-                        addPhys(new Brick(), 339.5, a-59-Math.sqrt(3)/2, true);
+                    //y0 -Math.sqrt(3)/2 
+                    //y0 -Math.sqrt(3)/2   a=x0 + length - rope_length
+                    if(a < x0 + rope_length)
+                        addPhys(new Brick(), x0+20.5, y0+x0-a-Math.sqrt(3)/2, true); 
+                    else if(a > x0 + length - rope_length - 1)
+                        addPhys(new Brick(), x0+39.5, y0+x0-a+(length-rope_length)-Math.sqrt(3)/2, true);
                 }
                 /**
                  * Add Anchors
                  */
                 Brick Anchor = new Brick();
                 Anchor.fixed = true;
-                addPhys(Anchor, 320.5, 270-Math.sqrt(3)/2, false);
+                addPhys(Anchor, x0+20.5, y0-rope_length-Math.sqrt(3)/2, false);
                 Brick Anchor2 = new Brick();
                 Anchor2.fixed = true;
-                addPhys(Anchor2, 339.5, 270-Math.sqrt(3)/2, false);
+                addPhys(Anchor2, x0+39.5, y0-rope_length-Math.sqrt(3)/2, false);
                 break;
             case "Brick":
                 /**
@@ -272,6 +283,38 @@ public class Lab{
                     if((a>10 && a < 13) || a > 17){
                         addPhys(new Fixed(), a, 13, false);
                     }
+                }
+                break;
+            case "Pulley":
+                x0 = 30;
+                y0 = 10;
+                double r0 = 4;
+                double r1 = 6;
+                double endY = 0;//Temp
+                length = 6;
+                //S = 1 = r*Dth Dth=1/r
+                //Make Pulley ring
+                for(double r = r0; r<r1; r++){
+                    for(double th = Math.PI; th< 2*Math.PI+1/r; th += 1/r){
+                        addPhys(new Fixed(), x0 + r*Math.cos(th), y0 + r*Math.sin(th), false);
+                    }
+                }
+                //Make Rope semiring
+                for(double th = Math.PI; th< 2*Math.PI+1/r1; th += 1/r1){
+                    endY = y0 + r1*Math.sin(th);//Keep track of the last bit
+                    addPhys(new Brick(), x0 + r1*Math.cos(th), endY, true);
+                }
+                //Make vertical part of rope
+                for(double y = y0+1; y< y0+length; y++){
+                    addPhys(new Brick(), x0 - r1, y, true);
+                    //Shift so it lines up with the curved bit
+                    addPhys(new Brick(), x0 + r1, y - y0 + endY, true);
+                }
+                //Make weight
+                for(double y = y0+length; y < y0+length+5; y++){
+                    addPhys(new Brick(), x0 - r1, y, true);
+                    addPhys(new Brick(), x0 - r1-Math.sqrt(3)/2, y+ .5, true);
+                    addPhys(new Brick(), x0 - r1+Math.sqrt(3)/2, y+ .5, true);
                 }
                 break;
                 

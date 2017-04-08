@@ -57,7 +57,7 @@ public class RunSim implements Runnable{
             System.out.println("Exception at "+System.currentTimeMillis()+": "+e);
             throw e;
         }
-        System.out.println("Simulation Ended at: "+System.currentTimeMillis());
+        debugShout("Simulation Ended at: "+System.currentTimeMillis(), 0);
     }
     private void loop(){
         while(!end){
@@ -77,7 +77,7 @@ public class RunSim implements Runnable{
                  * This next section adjusts the number of steps per frame
                  * Movement is resolved many times per frame so that 
                  *   particles do not pass through each other
-                 * Number of subframes = MaxV*10
+                 * Number of subframes = MaxV / maxD
                  */
                 //Have at least .001/maxD subframes. prevents a jumpy first frame
                 double maxV = .001;
@@ -157,7 +157,13 @@ public class RunSim implements Runnable{
                     }catch(Exception e){System.out.println(e);}
                 }
                 reportMem("C");
-                debugShout("Subframe: "+mamma.subFrameCount+" of "+Math.ceil(1/mamma.world.time));
+                //Impatience message. Prints out the current subframe and how many to go every 1e4 subframes
+                int sf_depth = (mamma.subFrameCount % 1e4)==0 ? 1: 2;
+                int totalFrames = (int)Math.ceil(1/mamma.world.time);
+                int percent = 100* mamma.subFrameCount/totalFrames;
+                debugShout("Subframe: "+mamma.subFrameCount+" of "+totalFrames+" ("+percent+"%)", sf_depth);
+                if(Execute.debugging > 0 && (mamma.subFrameCount % 1e4)==0)
+                    mamma.saveSim("temp");
                 //Frame
                 if(mamma.subFrameCount >= 1/mamma.world.time){
                     mamma.frameCount++;
@@ -171,6 +177,8 @@ public class RunSim implements Runnable{
                         Thread.sleep(rate);
                     }catch(Exception e){System.out.println(e);}
                     mamma.subFrameCount = 0;
+                    if(mamma.frameCount >= mamma.endFrame)
+                        end();
                 }
             }
         }

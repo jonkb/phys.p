@@ -1,0 +1,4 @@
+>ffmpeg -r 15 -i #.%d.png -vcodec libx264 -crf 15 #.mp4
+ 
+-crf	quality. low is better. 15-25 reccommended
+-r 	framerate 60 hi res

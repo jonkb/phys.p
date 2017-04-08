@@ -8,9 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 //import java.lang.System;
 
-public class Screen extends JPanel
-implements KeyListener, MouseWheelListener, 
-MouseListener, MouseMotionListener {
+public class Screen extends JPanel implements KeyListener, 
+MouseWheelListener, MouseListener, MouseMotionListener {
     Lab world; 
     RunSim run;
     
@@ -166,6 +165,9 @@ MouseListener, MouseMotionListener {
         world.curser.setLocation((int)(e.getX()/zRatio), (int)(e.getY()/zRatio));}
     public void mouseDragged(MouseEvent e) {}
     
+    /**Constructor
+     * All the arguments are replaced with the defaults
+     */
     public Screen(){
         System.out.print("Running Simulation: Precision= "+maxD+
             ": Save file= "+stem);
@@ -275,8 +277,8 @@ MouseListener, MouseMotionListener {
     public void paint(Graphics g){
         //System.out.println("painting");
         g.setFont(new Font("font", Font.BOLD, 11));
-            
-        if(run.ended()){
+        
+        if(!Execute.fileMode && run.ended()){
             g.setColor(Color.white);
             g.drawString("Simulation Complete", 10, height/ 2);
         }
@@ -300,22 +302,26 @@ MouseListener, MouseMotionListener {
                 g.drawString("recording  |  save destination: "+stem, 5, 81);
             else
                 g.drawString("not recording", 5, 81);
-            if(run.paused())
-                g.drawString("PAUSED", 5, 92);
-            else
-                g.drawString("RUNNING", 5, 92);
+            if(!Execute.fileMode){
+                if(run.paused())
+                    g.drawString("PAUSED", 5, 92);
+                else
+                    g.drawString("RUNNING", 5, 92);
+            }
             /**
              * Print the image of every being
              */
             for(BiList.Node n = world.beings.o1; n != null; n = n.getNext()){
                 Being being = (Being) n.getVal();
-                g.drawImage(being.getImage(), (int)(being.getDbX()*zRatio), (int)(being.getDbY()*zRatio), null);
+                g.drawImage(being.getImage(), (int)Math.round(being.getDbX()*zRatio), (int)Math.round(being.getDbY()*zRatio), null);
             }
         }
     }
     public void snap(){
-        System.out.println("Frame "+frameCount+": "+
-            milTimeToStr(System.currentTimeMillis()-Execute.t0));
+        /* System.out.println("Frame "+frameCount+": "+
+         *   milTimeToStr(System.currentTimeMillis()-Execute.t0));
+         *   This is duplicated in RunSim, so there were two messages
+        */  
         try{
             paint(back.getGraphics());
             File saveFile = new File(stem+frameCount+".png");
@@ -324,11 +330,33 @@ MouseListener, MouseMotionListener {
         catch(IOException e){}
         saveSim();
     }
+    public void snap(String tag, boolean savePhys){
+        /* System.out.println("Frame "+frameCount+": "+
+         *   milTimeToStr(System.currentTimeMillis()-Execute.t0));
+         *   This is duplicated in RunSim, so there were two messages
+        */  
+        try{
+            paint(back.getGraphics());
+            File saveFile = new File(stem+tag+".png");
+            ImageIO.write(back, "png", saveFile);
+        }
+        catch(IOException e){}
+        if(savePhys)
+            saveSim(tag);
+    }
     public void saveSim(){
         try{
             File saveFile = new File(stem+frameCount+".phys");
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile));
-            oos.writeObject(Execute.exportData(world.beings));
+            oos.writeObject(Execute.exportData(world.beings, frameCount, subFrameCount));
+        }
+        catch(IOException e){}
+    }
+    public void saveSim(String tag){
+        try{
+            File saveFile = new File(stem+tag+".phys");
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile));
+            oos.writeObject(Execute.exportData(world.beings, frameCount, subFrameCount));
         }
         catch(IOException e){}
     }

@@ -12,6 +12,6 @@ public class Rubber extends LinkedParticle
         super(10, 2, Color.GREEN);
         k = 2;//0;
         okDist = 1;
-        rad = .45;
+        r_max = .45;
     }
 }
