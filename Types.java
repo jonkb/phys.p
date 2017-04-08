@@ -1,5 +1,4 @@
-public enum Types 
-{
+public enum Types {
     FIXED, 
     SAND, 
     WATER, 

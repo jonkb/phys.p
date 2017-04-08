@@ -8,30 +8,26 @@ import java.util.ArrayList;
 import java.util.Date;
 //import java.lang.System;
 
-public class Screen extends JPanel
-implements KeyListener, ActionListener, MouseWheelListener, 
-MouseListener, MouseMotionListener {
+public class Screen extends JPanel implements KeyListener, 
+MouseWheelListener, MouseListener, MouseMotionListener {
     Lab world; 
+    RunSim run;
     
     //(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().width*1/2;
     static final int width = 768;
     //(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().height*1/2;
     static final int height = 576;
     
-    //Delay between timer triggers
-    private static int speed = 0;//10fps t = 100 ms //100fps (MAX)
     public static double maxD, zRatio;//10^- //For LinkedParticle.0001 - 00000001;
-    private Timer timer;
     private BufferedImage back;
     public static String stem;
     public static int endFrame;
-    private long startTime;
     
     private int scrollamount = 0;
+    public int frameCount = 1;
+    public int subFrameCount = 0;
     public boolean a = false; 
     public byte paused = 0; 
-    public int frameCount = 1;
-    private int subFrameCount = 0;
     
     public boolean onScreen;
     public static boolean recording = false;
@@ -78,7 +74,7 @@ MouseListener, MouseMotionListener {
                  * trace 2: (2-2)%10+1 = 1
                  * trace 10: (10-2)%10+1 = 9
                  */
-                world.density = (byte) ((world.density - 2)%10 + 1);//1 to 10
+                world.density = (byte) ((world.density - 1)%10);//1 to 10
                 break;
             case KeyEvent.VK_UP:
                 world.curserShape = (byte) ((world.curserShape + 1)%4);//0 to 3
@@ -110,21 +106,19 @@ MouseListener, MouseMotionListener {
                 world.curserType = Types.RUBBER;
                 break;
             case KeyEvent.VK_SPACE:
-                paused = (byte) ((paused + 1) & 1);// 0 to 1
+                run.togglePause();
+                //paused = (byte) ((paused + 1) & 1);// 0 to 1
                 break;
             case KeyEvent.VK_ESCAPE:
-                a = true;
+                run.end();
                 break;
             case KeyEvent.VK_R:
                 if(recording)
                     recording = false;
-                else
-                {
+                else{
                     frameCount = 0;
                     recording = true;
                 }
-                break;
-            default:
                 break;
         }
     }
@@ -170,83 +164,11 @@ MouseListener, MouseMotionListener {
     public void mouseMoved(MouseEvent e){
         world.curser.setLocation((int)(e.getX()/zRatio), (int)(e.getY()/zRatio));}
     public void mouseDragged(MouseEvent e) {}
-
-    //ActionListener command for timer - One Frame
-    public void actionPerformed(ActionEvent e){
-        subFrameCount++;
-        if(paused == 0){
-            if (!onScreen)
-                requestFocusInWindow();
-            
-            /**
-             * This next section adjusts the number of steps per frame
-             * Movement is resolved many times per frame so that 
-             *   particles do not pass through each other
-             * Number of subframes = MaxV*10
-             */
-            //Have at least .001/maxD subframes. prevents a jumpy first frame
-            double maxV = .001;
-            //Find the biggest V
-            for(Being being: world.beings){
-                if(being instanceof Physical){
-                    Physical phys = (Physical) being;
-                    if(Math.abs(phys.velocity.Mag()) > maxV)
-                        maxV = Math.abs(phys.velocity.Mag());
-                }
-            }
-            
-            if(maxV/maxD > 1)//more than one subframe required
-                world.time = maxD/maxV;
-            else
-                world.time = 1;
-            assert world.time > 0;
-            
-            for(Being being: world.beings){
-                being.act();
-            }
-            for(Being being: world.beings){
-                being.updateXY();//move
-            }
-            world.act();
-        }
-        //paused
-        else{
-            world.act();
-            world.curser.act();
-            if(subFrameCount > 20)
-            {
-                if(!Execute.fileMode)
-                    repaint();
-                subFrameCount = 0;
-            }
-        }
-        //This makes every frame happen 10 times per real frame
-        //if(subFrameCount % Math.ceil(.1/world.time) == 0)
-        //New phrasing stops the glitch where two frames happen 
-        //      in a row because world.time decreases slightly
-        if(subFrameCount > Math.ceil(.1/world.time))
-        {
-            frameCount++;
-            if(!Execute.fileMode)
-                repaint();
-            if(recording)
-                snap();
-            subFrameCount = 0;
-        }
-        
-        /**
-         * For ridiculous simulations and impatient people
-        if(subFrameCount % 10000 == 0){
-            Date now = new Date();
-            System.out.println(subFrameCount+" of "+Math.ceil(.1/world.time)+" needed. "+"time: "+now.toString());
-        }*/
-        
-        if(a || frameCount == endFrame)
-            stop();
-    }
     
-    public Screen()
-    {
+    /**Constructor
+     * All the arguments are replaced with the defaults
+     */
+    public Screen(){
         System.out.print("Running Simulation: Precision= "+maxD+
             ": Save file= "+stem);
         if(Execute.fileMode)
@@ -268,23 +190,25 @@ MouseListener, MouseMotionListener {
         setPreferredSize(new Dimension(width, height));
         
         a = false;
-        timer = new Timer(speed, this);
-        timer.setInitialDelay(1000);
         world = new Lab(this);
         
-        startTime = System.currentTimeMillis();
         if(!Execute.fileMode)
             repaint();//Adds a frame zero
         if(recording)
             snap();
-        timer.start();
+        //Start loop
     }
     
-    /**
-     * Constructor
+    /**Constructor
+     * endF: Frame at which to end the simulation
+     * precision: dt for Euler approximation
+     * saveFile: place to save images and .phys data
+     * SIM: name of a simulation to load automatically
+     * zoom: zoom factor
+     * start: whether or not to start automatically. 
+     *      If this is false, start() should be called externally
      */
-    public Screen(int endF, double precision, String saveFile, String SIM, double zoom, boolean start)
-    {
+    public Screen(int endF, double precision, String saveFile, String SIM, double zoom, boolean start){
         endFrame = endF;
         maxD = precision;
         stem = saveFile;
@@ -310,8 +234,6 @@ MouseListener, MouseMotionListener {
         setPreferredSize(new Dimension(width, height));
         
         a = false;
-        timer = new Timer(speed, this);
-        timer.setInitialDelay(1000);
         world = new Lab(this);
         
         world.sim(SIM);
@@ -322,8 +244,7 @@ MouseListener, MouseMotionListener {
     }
     
     
-    public void lose()
-    {
+    public void lose(){
         a = true;
         repaint();
         
@@ -333,33 +254,35 @@ MouseListener, MouseMotionListener {
      * Start the Timer. Also snap a frame zero
      */
     public void start(){
-        startTime = System.currentTimeMillis();
-        if(!Execute.fileMode)
-            repaint();//Adds a frame zero (though frameCount = 1 for file format)
-        if(recording)
-            snap();
-        timer.start();
+        run = new RunSim(this);
+        rps();
+        //start loop
+        Thread loop = new Thread(run);
+        loop.start();
     }
     /** 
      * Stop the Timer
      */
-    public void stop()
-    {
-        timer.stop();
-        System.out.println("Simulation Complete");
+    public void stop(){
+        //end loop
+        run.end();
     }
-    public void paint(Graphics g)
-    {
+    //Repaint, snap
+    public synchronized void rps(){
+        if(!Execute.fileMode)
+            repaint();
+        if(recording)
+            snap();
+    }
+    public void paint(Graphics g){
         //System.out.println("painting");
         g.setFont(new Font("font", Font.BOLD, 11));
-            
-        if(a)
-        {
+        
+        if(!Execute.fileMode && run.ended()){
             g.setColor(Color.white);
             g.drawString("Simulation Complete", 10, height/ 2);
         }
-        else
-        {
+        else{
             //Draw the black background
             g.setColor(Color.black);
             g.fillRect(0, 0, width, height);
@@ -369,7 +292,7 @@ MouseListener, MouseMotionListener {
             g.setColor(Color.white);
             //g.drawString("fp's': "+20/world.time , 5, 15);
             g.drawString("simulation time: "+ 
-                milTimeToStr(System.currentTimeMillis()-startTime), 5, 15);
+                milTimeToStr(System.currentTimeMillis()-Execute.t0), 5, 15);
             g.drawString("frame count: "+ frameCount, 5, 26);
             g.drawString("subframes: "+ subFrameCount, 5, 37);
             g.drawString("print density: "+ world.density, 5, 48);
@@ -379,20 +302,26 @@ MouseListener, MouseMotionListener {
                 g.drawString("recording  |  save destination: "+stem, 5, 81);
             else
                 g.drawString("not recording", 5, 81);
-            if(paused == 0)
-                g.drawString("RUNNING", 5, 92);
-            else
-                g.drawString("PAUSED", 5, 92);
+            if(!Execute.fileMode){
+                if(run.paused())
+                    g.drawString("PAUSED", 5, 92);
+                else
+                    g.drawString("RUNNING", 5, 92);
+            }
             /**
              * Print the image of every being
              */
-            for(Being being: world.beings)
-                g.drawImage(being.getImage(), (int)(being.getDbX()*zRatio), (int)(being.getDbY()*zRatio), null);
+            for(BiList.Node n = world.beings.o1; n != null; n = n.getNext()){
+                Being being = (Being) n.getVal();
+                g.drawImage(being.getImage(), (int)Math.round(being.getDbX()*zRatio), (int)Math.round(being.getDbY()*zRatio), null);
+            }
         }
     }
     public void snap(){
-        System.out.println("Frame "+frameCount+": "+
-            milTimeToStr(System.currentTimeMillis()-startTime));
+        /* System.out.println("Frame "+frameCount+": "+
+         *   milTimeToStr(System.currentTimeMillis()-Execute.t0));
+         *   This is duplicated in RunSim, so there were two messages
+        */  
         try{
             paint(back.getGraphics());
             File saveFile = new File(stem+frameCount+".png");
@@ -401,11 +330,33 @@ MouseListener, MouseMotionListener {
         catch(IOException e){}
         saveSim();
     }
+    public void snap(String tag, boolean savePhys){
+        /* System.out.println("Frame "+frameCount+": "+
+         *   milTimeToStr(System.currentTimeMillis()-Execute.t0));
+         *   This is duplicated in RunSim, so there were two messages
+        */  
+        try{
+            paint(back.getGraphics());
+            File saveFile = new File(stem+tag+".png");
+            ImageIO.write(back, "png", saveFile);
+        }
+        catch(IOException e){}
+        if(savePhys)
+            saveSim(tag);
+    }
     public void saveSim(){
         try{
             File saveFile = new File(stem+frameCount+".phys");
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile));
-            oos.writeObject(Execute.exportData(world.beings));
+            oos.writeObject(Execute.exportData(world.beings, frameCount, subFrameCount));
+        }
+        catch(IOException e){}
+    }
+    public void saveSim(String tag){
+        try{
+            File saveFile = new File(stem+tag+".phys");
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile));
+            oos.writeObject(Execute.exportData(world.beings, frameCount, subFrameCount));
         }
         catch(IOException e){}
     }
@@ -414,13 +365,29 @@ MouseListener, MouseMotionListener {
      * Convert a time in milliseconds to a String
      * with the format "hh:mm:ss"
      */
-    public static String milTimeToStr(long millis)
-    {
+    public static String milTimeToStr(long millis){
         long sec = Math.round(millis/1000);
         long ss = sec % 60;
         long mm = (sec / 60) % 60;
         long hh = sec / 3600;
         return String.format("%02d:%02d:%02d", hh, mm, ss);
+    }
+    
+    public static void debugShout(String message, int depth){
+        /* Generally: 0 = Once a sim
+         * 1= once a frame
+         * 2= multiple per frame
+        */
+        // How much to show - High depth messages only are printed if debugging is high
+        if(Execute.debugging >= depth){
+            System.out.println(message+ " at "+milTimeToStr(System.currentTimeMillis() - Execute.t0));
+        }
+    }
+    public static void debugShout(String message){
+        /* Default: 1*/
+        if(Execute.debugging >= 1){
+            System.out.println(message+ " at "+milTimeToStr(System.currentTimeMillis() - Execute.t0));
+        }
     }
 }
 

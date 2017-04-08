@@ -25,7 +25,7 @@ public class Spring extends LinkedParticle
             partner = new Spring();
             partner.partner = this;
             partner.seed = false;
-            world.addBeing(partner, (int) Math.round(X), (int) Math.round(Y + okDist));
+            world.addPhys(partner, X, Y + okDist);
             //Neighbors.add(partner);
             //partner.Neighbors.add(this);
         }

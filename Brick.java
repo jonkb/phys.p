@@ -10,6 +10,6 @@ public class Brick extends LinkedParticle
     public Brick()
     {
         super(.3, 1.8, Color.ORANGE);
-        rad = .02;
+        r_max = .1;
     }
 }
