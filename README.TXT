@@ -4,7 +4,7 @@ Tell the reader (someone who does not know anything about this project)
 all he/she needs to know. The comments should usually include at least:
 ------------------------------------------------------------------------
 
-PROJECT TITLE:              Physics  -  Gridless
+PROJECT TITLE:              Physics - Particles 3
 
 PURPOSE OF PROJECT:         To simulate physical interaction of particles with variable precision.
                             To model solid objects on a molecular level by using a single function representing 

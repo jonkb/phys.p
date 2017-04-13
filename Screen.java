@@ -313,10 +313,44 @@ MouseWheelListener, MouseListener, MouseMotionListener {
              */
             for(BiList.Node n = world.beings.o1; n != null; n = n.getNext()){
                 Being being = (Being) n.getVal();
-                g.drawImage(being.getImage(), (int)Math.round(being.getDbX()*zRatio), (int)Math.round(being.getDbY()*zRatio), null);
+                int offset = 0;
+                if(zRatio >= 4)
+                    offset = (int)Math.ceil(zRatio/4.0);
+                g.drawImage(being.getImage(), (int)Math.round(being.getDbX()*zRatio)-offset, (int)Math.round(being.getDbY()*zRatio)-offset, null);
             }
         }
     }
+    /**
+     * Given absolute coordinates of a particle, draw an image to be placed over the point
+     * Should work better than drawCircle or fillCircle
+     *
+    private BufferedImage genCircle(double X, double Y, Color color){
+        //absolute radius is always 1/4
+        double radius = zRatio / 4; //cells
+        int cx = (int) Math.round(X*zRatio); //cells
+        int cy = (int) Math.round(Y*zRatio); //cells
+        int w = 2*Math.ceil(radius) + 1; //+1 for center dot
+        int h = w;
+        double px, py;
+        BufferedImage circle = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+        for(int px = 0; px < w; px++){
+            for(int py = 0; py < h; py++){
+                //absolute coordinates of the current pixel in the image
+                pX = ( cx - Math.ceil(radius) + px )/zRatio;
+                pY = ( cy - Math.ceil(radius) + py )/zRatio;
+                //p[delta](X/Y)
+                pdX = pX - X;
+                pdY = pY - Y;
+                //pdx^2+pdy^2 < (1/4)^2
+                if( pdX*pdX + pdY*pdY < 1/16)
+                    circle.setRGB(px,py,color.getRGB());
+            }
+        }
+        return circle;
+    }*/
+    /**
+     * Saves the screen to file
+     */
     public void snap(){
         /* System.out.println("Frame "+frameCount+": "+
          *   milTimeToStr(System.currentTimeMillis()-Execute.t0));

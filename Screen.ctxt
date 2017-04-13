@@ -33,6 +33,7 @@ comment20.params=g
 comment20.target=void\ paint(java.awt.Graphics)
 comment21.params=
 comment21.target=void\ snap()
+comment21.text=\r\n\ Saves\ the\ screen\ to\ file\r\n
 comment22.params=tag\ savePhys
 comment22.target=void\ snap(java.lang.String,\ boolean)
 comment23.params=
