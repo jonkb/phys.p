@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class Being
 {
-    protected int x, y;
+    protected double x, y;
     Lab world;
     private BufferedImage classImage;
     private BufferedImage image;
@@ -30,13 +30,9 @@ public class Being
     public void print(){}
     public void updateXY(){}
     public void addedToWorld(){}
-    public int getX()
+    public double getX()
     {return x;}
-    public int getY()
-    {return y;}
-    public double getDbX()
-    {return x;}
-    public double getDbY()
+    public double getY()
     {return y;}
     public BufferedImage getImage()
     {return image;}
@@ -54,8 +50,8 @@ public class Being
         //world.grid[x][y] = null;
         assert X>=0 && X<= world.getWidth(): "X out of bounds";
         assert Y>=0 && Y<= world.getHeight(): "Y out of bounds";
-        x = (int) Math.round(X);
-        y = (int) Math.round(Y);
+        x = X;
+        y = Y;
     } 
     public void setImage(BufferedImage newImage)
     {image = newImage;}

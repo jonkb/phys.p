@@ -50,9 +50,11 @@ public class LinkedParticle extends Particle {
             }
         }
     }
-    //Repulsive force at a given distance
+    /* F(r) = Repulsive force at a given distance
+     * This version makes a brick crystallize
+     */
     protected double F(double r) {
-        //Simply, numerator
+        //Simply numerator
         double num = k*r_max*r_max/2.0;
         if(r < okDist-r_max)
         //With infintessimal step size, this would never happen

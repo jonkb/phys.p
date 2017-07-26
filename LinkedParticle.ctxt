@@ -5,6 +5,7 @@ comment1.params=
 comment1.target=void\ applyEM()
 comment2.params=r
 comment2.target=double\ F(double)
+comment2.text=\ F(r)\ \=\ Repulsive\ force\ at\ a\ given\ distance\r\n\ This\ version\ makes\ a\ brick\ crystallize\r\n
 comment3.params=r
 comment3.target=double\ F1(double)
 comment4.params=r

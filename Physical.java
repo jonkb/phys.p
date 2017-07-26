@@ -24,10 +24,6 @@ public class Physical extends Being{
         fixed = F;
     }
     
-    public double getDbX()
-    {return X;}
-    public double getDbY()
-    {return Y;}
     public void addedToWorld(){
         X = getX();
         Y = getY();

@@ -28,8 +28,7 @@ public class Curser extends Being
     public void makeImage()
     {
         Color color;
-        switch(world.curserType)
-        {
+        switch(world.curserType){
             case SAND:
                 color = Color.YELLOW;
                 break;
@@ -47,6 +46,9 @@ public class Curser extends Being
                 break;
             case FIXED:
                 color = Color.GRAY;
+                break;
+            case CRYSTAL:
+                color = Color.CYAN;
                 break;
             default:
                 color = Color.WHITE;
@@ -68,7 +70,16 @@ public class Curser extends Being
             break;
             
             case 1: // Hexagon
-            int r = pW-1;
+            int r = pW - (int)world.getZoom();
+            if(r < 1){
+                //From above
+                image = new BufferedImage(pW, pH, BufferedImage.TYPE_4BYTE_ABGR);
+                graph = image.createGraphics();
+                graph.setColor(color);
+                graph.draw(new Rectangle(0, 0, pW - 1, pH - 1));
+                setImage(image);
+                break;
+            }
             double h = r * Math.sqrt(3);
             int[] x =
                {r+r,

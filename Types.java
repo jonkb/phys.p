@@ -4,5 +4,6 @@ public enum Types {
     WATER, 
     BOMB, 
     BRICK,
-    RUBBER
+    RUBBER,
+    CRYSTAL
 }

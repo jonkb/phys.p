@@ -1,7 +1,7 @@
 #BlueJ class context
 comment0.params=args
 comment0.target=void\ main(java.lang.String[])
-comment0.text=\r\n\ h\ -\ help\r\n\ hsim\ -\ list\ sims\r\n\ l[]\ -\ load\r\n\ v[]\ -\ preView\r\n\ d\#\ -\ debugging\ \r\n\ z\#\ -\ zoom\ \r\n\ p\#\ -\ precision\ \r\n\ pl\ -\ load\ precision\ (use\ with\ l[])\r\n\ t\#\ -\ max_threads\ \r\n\ n\#\ -\ simNum\ \r\n\ e\#\ -\ endF\r\n\ s[]\ -\ SIM\r\n\ i\ -\ interactive\ mode\r\n\ istep\ -\ stepwise\ mode\r\n\ Example\:\ java\ Execute\ d0\ z2\ t512\ sSandFall\r\n
+comment0.text=\r\n\ h\ -\ help\r\n\ hsim\ -\ list\ sims\r\n\ l[]\ -\ load\r\n\ v[]\ -\ preView\r\n\ d\#\ -\ debugging\ \r\n\ z\#\ -\ zoom\ \r\n\ p\#\ -\ precision\ \r\n\ pl\ -\ load\ precision\ (use\ with\ l[])\r\n\ t\#\ -\ max_threads\ \r\n\ n\#\ -\ simNum\ \r\n\ e\#\ -\ endF\r\n\ s[]\ -\ SIM\r\n\ g\#\ -\ set\ gravity\ magnitude\r\n\ i\ -\ interactive\ mode\r\n\ istep\ -\ stepwise\ mode\r\n\ Example\:\ java\ Execute\ d0\ z2\ t512\ sSandFall\r\n
 comment1.params=body
 comment1.target=void\ help(java.lang.String)
 comment10.params=world

@@ -20,7 +20,7 @@ public class Lab{
      *    assuming g = 10m/s^2
      *    &fps = 20, 40c = 1m
      */
-    private int gravity = 1;
+    private double gravity = 1;
     private vector gravityV = new vector(1.0, Math.PI/2);
     public final boolean air = true;
     
@@ -105,6 +105,11 @@ public class Lab{
             return here;
         else 
             return null;
+    }
+    //Specify gravity magnitude (positive number). 1 is default.
+    public void setGravity(double grav){
+        gravity = grav;
+        gravityV = new vector(grav, Math.PI/2);
     }
     
     public Lab(Screen s){
@@ -369,8 +374,11 @@ public class Lab{
     public void erase(){
         for(BiList.Node n = beings.o1; n!= null; n = n.getNext()){
             Being being = (Being) n.getVal();
-            if(being.getX() >= curser.getX() && being.getX() < curser.getX()+curserW
-            && being.getY() >= curser.getY() && being.getY() < curser.getY()+curserH
+            //1/4 is the centering offset from Screen.print()
+            double cleft = curser.getX() - 1.0/4;
+            double ctop = curser.getY() - 1.0/4;
+            if(being.getX() >= cleft && being.getX() < cleft+curserW
+            && being.getY() >= ctop && being.getY() < ctop+curserH
             && being != curser)
                 removeBeing(being);    
         }
@@ -386,9 +394,10 @@ public class Lab{
     }
     
     class PrintRequest implements Runnable{
-        int cx,cy,cw,ch;
+        double cx,cy;
+        int cw,ch;
         
-        public PrintRequest(int x, int y, int w, int h){
+        public PrintRequest(double x, double y, int w, int h){
             this.cx = x;
             this.cy = y;
             this.cw = w;
@@ -429,6 +438,9 @@ public class Lab{
                             case RUBBER: 
                             particle = new Rubber();
                             break;
+                            case CRYSTAL: 
+                            particle = new Crystal();
+                            break;
                             default: particle = new Sand();
                         }
                         //addBeing(particle, curser.getX() - curserSize / 2 + a, 
@@ -445,19 +457,19 @@ public class Lab{
     
                 case 1:  //Hexagon
                 //which hexagonal number (number of rings
-                int n = density*cw + 1;
+                int n = density*cw;
                 int nParts = 3*n*(n-1) + 1;//source: wiki centered hexagonal number
     
                 // NEVERMIND -Too much trig - Prints all particles spiraling outward from the center 
                 //INSTEAD - go Row by Row
-                for(int a = 0; a < 2*(n+1); a++){
+                for(int a = 0; a < 2*n-1; a++){
                     y = cy + a*Math.sqrt(3)/2.0/density; //a*1/2*sqrt(3)
-                    //number of particles in this row
-                    int rowLen = 2*n-1-Math.abs(n-a-1);
                     //distance in rows from center row
-                    int offSet = Math.abs(n-a-1);
+                    int offset = Math.abs(n-a-1);
+                    //number of particles in this row
+                    int rowLen = 2*n-1-offset;
                     for(int b = 0; b < rowLen; b++){
-                        x = cx + (offSet/2.0 + b)/density;
+                        x = cx + (offset/2.0 + b)/density;
     
                         switch(curserType){
                             case FIXED: 
@@ -477,6 +489,9 @@ public class Lab{
                             break;
                             case RUBBER: 
                             particle = new Rubber();
+                            break;
+                            case CRYSTAL: 
+                            particle = new Crystal();
                             break;
                             default: particle = new Sand();
                         }
@@ -491,9 +506,9 @@ public class Lab{
                 double h = Math.sqrt(3)/2/density;//Height of one row
                 double lastCol = cx+cw;
                 double lastRow = cy+ch;
-                for(x = cx; x <= lastCol; x+= 1/density){
+                for(x = cx; x < lastCol; x+= 1.0/density){
                     int row = 0;
-                    for(y = cy; y <= lastRow; y += h){
+                    for(y = cy; y < lastRow; y += h){
                         switch(curserType){
                             case FIXED: 
                             particle = new Fixed();
@@ -513,14 +528,18 @@ public class Lab{
                             case RUBBER: 
                             particle = new Rubber();
                             break;
+                            case CRYSTAL: 
+                            particle = new Crystal();
+                            break;
                             default: particle = new Sand();
                         }
-                        double offSet = 0;
+                        //Offset every other row by .5
+                        double offset = 0;
                         if((row & 1) == 1)//odd row
-                            offSet = .5/density;
-                        if(x+offSet > 0 && x+offSet < wWidth 
+                            offset = .5/density;
+                        if(x+offset > 0 && x+offset < wWidth 
                             && y > 0 && y < wHeight){
-                            addPhys(particle, x, y, (curserType != Types.FIXED));
+                            addPhys(particle, x+offset, y, (curserType != Types.FIXED));
                         }
     
                         row++;//int row = (int) Math.round((b-cy)/h)
@@ -554,6 +573,9 @@ public class Lab{
                             break;
                             case RUBBER: 
                             particle = new Rubber();
+                            break;
+                            case CRYSTAL: 
+                            particle = new Crystal();
                             break;
                             default: particle = new Sand();
                         }

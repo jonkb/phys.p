@@ -8,7 +8,7 @@ public class Execute{
     static Screen screen;
     public static long t0;
     //0: just a few messages 1:a few each frame 2: lots 3:stupid lots
-    public static int debugging = 2;
+    public static int debugging = 1;
     //How much multithreading? 0: unlimited ; more: max that many
     public static int max_threads = 1;
     
@@ -22,7 +22,8 @@ public class Execute{
         simNum = 1;
     private static double
         precision = 1e-2,//1e-5,//.00000005;
-        zoom = 16;
+        zoom = 24,
+        gravity = 1;
     private static String 
         SIM = "",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
@@ -40,6 +41,7 @@ public class Execute{
      * n# - simNum 
      * e# - endF
      * s[] - SIM
+     * g# - set gravity magnitude
      * i - interactive mode
      * istep - stepwise mode
      * Example: java Execute d0 z2 t512 sSandFall
@@ -95,12 +97,16 @@ public class Execute{
                 case "s":
                     SIM = body;
                     break;
+                case "g":
+                    gravity = Double.parseDouble(body);
             }
         }
         saveFile = "Tests/"+SIM+"/"+simNum+".";
         t0 = System.currentTimeMillis();
         System.gc();
         screen = new Screen(endF, precision, saveFile, SIM, zoom, true);
+        if(gravity != 1)
+            screen.world.setGravity(gravity);
         
         saveFile = "Tests/"+SIM+"/"+simNum+".";
         if( SIM.equals(""))
@@ -129,6 +135,7 @@ public class Execute{
                 System.out.println("\ti - interactive mode");
                 System.out.println("\tistep - stepwise mode");
                 System.out.println("\tt# - threads");
+                System.out.println("\tg# - gravity (default 1)");
                 System.out.println("\tn# - sim number. Shows up in file names.");
                 System.out.println("\te# - end frame");
                 System.out.println("\ts[string] - SIM name for loading an automatic sim");

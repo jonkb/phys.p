@@ -105,6 +105,9 @@ MouseWheelListener, MouseListener, MouseMotionListener {
             case KeyEvent.VK_5:
                 world.curserType = Types.RUBBER;
                 break;
+            case KeyEvent.VK_6:
+                world.curserType = Types.CRYSTAL;
+                break;
             case KeyEvent.VK_SPACE:
                 run.togglePause();
                 //paused = (byte) ((paused + 1) & 1);// 0 to 1
@@ -145,13 +148,13 @@ MouseWheelListener, MouseListener, MouseMotionListener {
         if(e.getButton() == MouseEvent.BUTTON1)
         {
             //System.out.println("print");
-            world.curser.setLocation((int)(e.getX()/zRatio), (int)(e.getY()/zRatio));
+            world.curser.setLocation(e.getX()/zRatio, e.getY()/zRatio);
             world.print();
         }
         if(e.getButton() == MouseEvent.BUTTON3)
         {
             //System.out.println("erase");
-            world.curser.setLocation((int)(e.getX()/zRatio), (int)(e.getY()/zRatio));
+            world.curser.setLocation(e.getX()/zRatio, e.getY()/zRatio);
             world.erase();
         }
     }
@@ -162,7 +165,7 @@ MouseWheelListener, MouseListener, MouseMotionListener {
     
     //MouseMotionListener commands
     public void mouseMoved(MouseEvent e){
-        world.curser.setLocation((int)(e.getX()/zRatio), (int)(e.getY()/zRatio));}
+        world.curser.setLocation(e.getX()/zRatio, e.getY()/zRatio);}
     public void mouseDragged(MouseEvent e) {}
     
     /**Constructor
@@ -311,12 +314,14 @@ MouseWheelListener, MouseListener, MouseMotionListener {
             /**
              * Print the image of every being
              */
+            //The offset centers images (of particles at least) around their location
+            int offset = 0;
+            if(zRatio >= 4)
+                offset = (int)Math.ceil(zRatio/4.0);
             for(BiList.Node n = world.beings.o1; n != null; n = n.getNext()){
                 Being being = (Being) n.getVal();
-                int offset = 0;
-                if(zRatio >= 4)
-                    offset = (int)Math.ceil(zRatio/4.0);
-                g.drawImage(being.getImage(), (int)Math.round(being.getDbX()*zRatio)-offset, (int)Math.round(being.getDbY()*zRatio)-offset, null);
+                g.drawImage(being.getImage(), (int)Math.round(being.getX()*zRatio)-offset, 
+                (int)Math.round(being.getY()*zRatio)-offset, null);
             }
         }
     }
