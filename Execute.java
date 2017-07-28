@@ -25,7 +25,7 @@ public class Execute{
         zoom = 24,
         gravity = 1;
     private static String 
-        SIM = "",//"SandFall",
+        SIM = "Liquid",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     /**

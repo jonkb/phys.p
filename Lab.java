@@ -322,6 +322,17 @@ public class Lab{
                     addPhys(new Brick(), x0 - r1+Math.sqrt(3)/2, y+ .5, true);
                 }
                 break;
+            case "Liquid":
+                //Make globe for gas
+                double r = 10;
+                x0 = 12;
+                y0 = 12;
+                double spacing = .75;
+                for(double th = 0; th < 2*Math.PI; th += spacing/r){
+                    addPhys(new Fixed(), x0+r*Math.cos(th), y0+r*Math.sin(th), false);
+                }
+                
+                break;
                 
             default:
                 return false;
@@ -547,14 +558,17 @@ public class Lab{
                 }
                 break;
     
-                case 3:  //Hollow Circle
+                case 3:  //Hollow Circle (annulus)
                 int r = cw; //inner radius
-                int rings = ch; // # of rings progressing outwards
+                int rings = ch*density; // # of rings progressing outwards
     
                 for(int a = 0; a < rings; a++){
+                    //radius of current ring
+                    double R = r+a*1.0/density;
                     //Path Length (circumference) = 2*pi*r
-                    int cir = (int) Math.floor(2*Math.PI*(r+a));
-                    for(int b = 0; b < cir; b++){
+                    double cir = 2*Math.PI*R;
+                    //b = path length traveled
+                    for(double b = 0; b < cir; b+= 1.0/density){
                         switch(curserType){
                             case FIXED: 
                             particle = new Fixed();
@@ -579,10 +593,10 @@ public class Lab{
                             break;
                             default: particle = new Sand();
                         }
-                        //angle = 2pi / len * b
+                        //angle = 2pi * b / cir
                         double th = 2*b*Math.PI / cir;
-                        x = cx + (r + a)*Math.cos(th);
-                        y = cy + (r + a)*Math.sin(th);
+                        x = cx + R*Math.cos(th);
+                        y = cy + R*Math.sin(th);
     
                         if(x > 0 && x < wWidth && y > 0 && y < wHeight)
                             addPhys(particle, x, y, (curserType != Types.FIXED));
