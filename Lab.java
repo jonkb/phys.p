@@ -333,6 +333,12 @@ public class Lab{
                 }
                 
                 break;
+            case "Floor":
+                for(double x = wWidth/4.0; x <= 3*wWidth/4.0; x++){
+                    addPhys(new Fixed(), x, 7*wHeight/8.0, false);
+                }
+                addPhys(new Fixed(), wWidth/4.0 - Math.sqrt(3)/2, 7*wHeight/8.0 - .5, false);
+                addPhys(new Fixed(), 3*wWidth/4.0 + Math.sqrt(3)/2, 7*wHeight/8.0 - .5, false);
                 
             default:
                 return false;
