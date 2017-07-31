@@ -14,7 +14,7 @@ public class Execute{
     
     //Execution Options:
     public static boolean 
-        fileMode = false,
+        fileMode = true,
         loadPre = false, // When loading a file, load the precision too
         stepWise = false; // Pause & ask for confirmation after each frame & 100 000 subframes
     private static int 
@@ -524,8 +524,7 @@ public class Execute{
         return scan.nextLine();
     }
     public static boolean promptB(String prompt){
-        prompt += " (y/n)";
-        System.out.println(prompt);
+        System.out.println(prompt + " (y/n)");
         Scanner scan = new Scanner(System.in);
         String res = scan.nextLine();
         if(res.equals("y") || res.equals("Y"))
