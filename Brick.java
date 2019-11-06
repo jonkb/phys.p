@@ -9,7 +9,7 @@ public class Brick extends LinkedParticle
 {
     public Brick()
     {
-        super(.3, 1.8, Color.ORANGE);
-        r_max = .1;
+        super(.3, Color.ORANGE);
+        r_stretch = .1;
     }
 }

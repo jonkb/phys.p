@@ -9,8 +9,8 @@ public class LTest extends LinkedParticle
 {
     public LTest()
     {
-        super(10, 2, Color.RED);
+        super(10, Color.RED);
         k = 40;//0;
-        okDist = 2;
+        r0 = 2;
     }
 }

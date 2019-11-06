@@ -14,18 +14,18 @@ public class Execute{
     
     //Execution Options:
     public static boolean 
-        fileMode = true,
+        fileMode = false,
         loadPre = false, // When loading a file, load the precision too
         stepWise = false; // Pause & ask for confirmation after each frame & 100 000 subframes
     private static int 
         endF = 1000000,
-        simNum = 1;
+        simNum = 4;
     private static double
-        precision = 1e-2,//1e-5,//.00000005;
-        zoom = 24,
+        precision = 1e-4,//1e-5,//.00000005;
+        zoom = 8,
         gravity = 1;
     private static String 
-        SIM = "",//"SandFall",
+        SIM = "SuBridge",//"SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     /**

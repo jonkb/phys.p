@@ -5,8 +5,8 @@ import java.awt.Color;
 public class Crystal extends LinkedParticle
 {
     public Crystal(){
-        super(10, 6, Color.CYAN);
-        okDist = 80;
+        super(10, Color.CYAN);
+        r0 = 80;
     }
     protected double F(double r){
         /*

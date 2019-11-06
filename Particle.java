@@ -2,19 +2,22 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Particle extends Physical
-{
-    public double coOfDiffusion;
+public class Particle extends Physical{
+    protected double coOfDiffusion = 0;
+    protected double em_k = 1;
+    protected double em_range = 10;
+    protected double r_em_max = 3;
+    protected double r_diff_max = 10;
     private Color color;
-    public Particle(double m, boolean fixed, double coOfDiffusion, Color colour){
+    
+    public Particle(double m, boolean fixed, Color colour){
         super(m, fixed);
         
         color = colour;
         BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR);
         image.setRGB(0, 0, colour.getRGB());
         setImage(image);
-        
-        this.coOfDiffusion = coOfDiffusion;
+        em_k = m;//Scale to mass so the normal distance of 1 cancels gravity
     }
     
     public BufferedImage getImage(){
@@ -55,14 +58,8 @@ public class Particle extends Physical
             return circle;
         }
     }
-    /**
-     * Act - do whatever the Particle wants to do. This method is called whenever
-     * the 'Act' or 'Run' button gets pressed in the environment.
-     */
-    public void act()//I Moved the move function to the second phase so it all happens at once 
-    {
-        if(this != null)
-        {
+    public void act(){//I Moved the move function to the second phase so it all happens at once 
+        if(this != null){
             applyFriction();
             applyGravity();
             applyEM();
@@ -70,33 +67,39 @@ public class Particle extends Physical
             //System.out.println(this+"is Acting");
         }
     }
-    public void applyEM()
-    {
-        if(coOfDiffusion != 0)
-        {
-            //ArrayList<Particle> particles = getParticlesInRange3(5);
-            //ArrayList<Particle> particles = getAllOtherParticles();
-            ArrayList<Particle> particles = getParticlesInRange(20);
-            for(Particle near: particles){
-                double d = Math.sqrt((near.X - X)*(near.X - X)+(near.Y - Y)*(near.Y - Y));
-                assert d > 0: d;
-                double th = Math.atan2(Y-near.Y, X-near.X);//angle from you to me
-                applyForceAtCenter(F(d), th);
-                near.applyForceAtCenter(F(d), th+Math.PI);
-            }
+    public void applyEM(){
+        ArrayList<Particle> particles = getParticlesInRange(em_range);
+        for(Particle near: particles){
+            double d = Math.sqrt((near.X - X)*(near.X - X)+(near.Y - Y)*(near.Y - Y));
+            double th = Math.atan2(Y-near.Y, X-near.X);//angle from you to me
+            double F_sum = 0;
+            if(near.type() == this.type())
+                F_sum = F_em(d)+F_diff(d);
+            else
+                F_sum = F_em(d);
+            applyForceAtCenter(F_sum, th);
+            near.applyForceAtCenter(F_sum, th+Math.PI);
         }
     }
-    protected double F(double r)
-    {
-        return coOfDiffusion/r/r;
+    //Diffusion
+    protected double F_diff(double r){
+        if(r < r_diff_max)
+            return coOfDiffusion/r/r;
+        else
+            return 0;
+    }
+    //EM for collisions
+    protected double F_em(double r){
+        if(r < r_em_max)
+            return em_k/r/r;
+        else
+            return 0;
     }
     public void interAct(){}
-    public String toString()
-    {
+    public String toString(){
         return this.getClass().getSimpleName() + ": ("+X+", "+Y+")";
     }
-    public Types type()
-    {
+    public Types type(){
         if(this instanceof Fixed)
             return Types.FIXED;
         if(this instanceof Sand)
@@ -109,6 +112,8 @@ public class Particle extends Physical
             return Types.BRICK;
         if(this instanceof Rubber)
             return Types.RUBBER;
+        if(this instanceof Crystal)
+            return Types.CRYSTAL;
         return null;
     }
 }

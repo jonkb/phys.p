@@ -5,9 +5,8 @@ public class Fixed extends Particle
     public final double velocityY = 0;
     
     
-    public Fixed()
-    {
-        super(100.0, true, 1.0, Color.GRAY);
+    public Fixed(){
+        super(100.0, true, Color.GRAY);
         //(mass, fixed, coOfDiff, colour)
     }
     public void print(){}

@@ -49,7 +49,7 @@ public class Being
     {
         //world.grid[x][y] = null;
         assert X>=0 && X<= world.getWidth(): "X out of bounds";
-        assert Y>=0 && Y<= world.getHeight(): "Y out of bounds";
+ 
         x = X;
         y = Y;
     } 

@@ -9,8 +9,8 @@ public class LCharge extends LinkedParticle
 {
     public LCharge()
     {
-        super(10, 2, Color.RED);
+        super(10, Color.RED);
         k = 40;
-        okDist = 10;
+        r0 = 10;
     }
 }

@@ -6,15 +6,12 @@ import java.util.ArrayList;
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class Bomb extends Particle
-{
+public class Bomb extends Particle{
     int charges = 1;
-    public Bomb()
-    {
-        super(1, false, .5, Color.RED);
+    public Bomb(){
+        super(1, false, Color.RED);
     }
-    public void interAct()
-    {
+    public void interAct(){
         ArrayList<Particle> Neighbors = getParticlesInRange(1);
         for(int a = 0; a < Neighbors.size(); a++)
         {

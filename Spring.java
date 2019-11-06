@@ -15,7 +15,7 @@ public class Spring extends LinkedParticle
     int k = 2;
     public Spring()
     {
-        super(1, 2, Color.GREEN);
+        super(1, Color.GREEN);
     }
     public void addedToWorld()
     {

@@ -9,6 +9,6 @@ public class Charge extends Particle
 {
     public Charge()
     {
-        super(1, false, 100, Color.WHITE);
+        super(1, false, Color.WHITE);
     }
 }

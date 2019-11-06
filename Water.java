@@ -10,7 +10,7 @@ public class Water extends LinkedParticle
 {
     public Water()
     {
-        super(1, 8, Color.BLUE);
+        super(1, Color.BLUE);
     }
     protected double F(double r)
     {

@@ -9,9 +9,9 @@ public class Rubber extends LinkedParticle
 {
     public Rubber()
     {
-        super(10, 2, Color.GREEN);
+        super(10, Color.GREEN);
         k = 2;//0;
-        okDist = 1;
-        r_max = .45;
+        r0 = 1;
+        r_stretch = .45;
     }
 }
