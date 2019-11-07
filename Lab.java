@@ -267,13 +267,14 @@ public class Lab{
                 }
                 break;
             case "SandFall":
-                for(int a = 100; a < 110; a++)
-                    for(int b = 100; b < 110; b++){
+                for(int a = 10; a < 20; a++){
+                    for(int b = 4; b < 14; b++){
                         //Large Square
                         addPhys(new Sand(), a, b, true);
                         //Small Dense square underneath
-                        addPhys(new Fixed(), 103 + (a-100)/3, 113 + (b-100)/3, false);//303-306
+                        addPhys(new Fixed(), 13 + (a-10)/3, 17 + (b-4)/3, false);//13-16
                     }
+                }
                 break;
             case "TinyBridge":
                 /**

@@ -224,7 +224,7 @@ MouseWheelListener, MouseListener, MouseMotionListener {
             System.out.println(": FILE ONLY MODE");
         }
         else{
-            recording = true;//TEMP
+            recording = false;
             System.out.println(": Interactive Mode");
             addKeyListener(this);
             addMouseWheelListener(this);

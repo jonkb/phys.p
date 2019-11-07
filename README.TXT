@@ -15,7 +15,7 @@ VERSION or DATE:            Fall 2015
 HOW TO START THIS PROJECT:  Execute.main({});
 
 from command line, the syntax is as follows:
-java [-Xss64k] Execute [options]
+java [-Xss108k] Execute [options]
 Example: java Execute d0 z2 t512 sSandFall
 
 Options: tag followed by value
@@ -29,7 +29,7 @@ Options: tag followed by value
     n# - simNum 
     s[str] - SIM
 
-The block [-Xss64k] specifies the stack size of a thread.
+The block [-Xss108k] specifies the stack size of a thread.
 If you use unlimited multithreading (mt_mode = 0), specify this 
     (the default is 1m (1mb))
 debugging: 0: just a few messages 1:a few each frame 2: lots

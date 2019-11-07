@@ -14,18 +14,19 @@ public class Execute{
     
     //Execution Options:
     public static boolean 
-        fileMode = false,
+        fileMode = true,
         loadPre = false, // When loading a file, load the precision too
         stepWise = false; // Pause & ask for confirmation after each frame & 100 000 subframes
     private static int 
-        endF = 1000000,
-        simNum = 4;
+        endF = 100000,
+        filemode_max_frames = 5000,
+        simNum = 6;
     private static double
-        precision = 1e-4,//1e-5,//.00000005;
-        zoom = 8,
+        precision = 2e-4,//1e-5,//.00000005;
+        zoom = 24,
         gravity = 1;
     private static String 
-        SIM = "SuBridge",//"SandFall",
+        SIM = "SandFall",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     /**
@@ -112,6 +113,9 @@ public class Execute{
         if( SIM.equals(""))
             saveFile = "Tests/"+simNum+".";
         
+        //Prevent terrible accidents that bloat the computer with 200,000 png files
+        if(fileMode && endF > filemode_max_frames)
+            endF = filemode_max_frames;
         if(!fileMode){
             JFrame frame = new JFrame("Particles");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
