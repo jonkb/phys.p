@@ -12,17 +12,8 @@ public class RunSim implements Runnable{
     public RunSim(Screen mom){
         mamma = mom;
         startTime = System.currentTimeMillis();
-    }
-    public void togglePause(){
-        if(paused){
-            paused = false;
-            prevTime = System.currentTimeMillis();
-            debugShout("Unpausing.", 1);
-        }
-        else{
+        if(mamma.startPaused)
             paused = true;
-            debugShout("Pausing.", 1);
-        }
     }
     public void pause(){
         paused = true;
@@ -32,6 +23,12 @@ public class RunSim implements Runnable{
         paused = false;
         prevTime = System.currentTimeMillis();
         debugShout("Unpausing.", 1);
+    }
+    public void togglePause(){
+        if(paused)
+            unpause();
+        else
+            pause();
     }
     public boolean paused(){
         return paused;

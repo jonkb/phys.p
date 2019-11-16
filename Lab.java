@@ -323,6 +323,65 @@ public class Lab{
                     addPhys(new Brick(), x0 - r1+Math.sqrt(3)/2, y+ .5, true);
                 }
                 break;
+            case "Pulley_2":
+                x0 = 18;//Center of the left pulley wheel
+                y0 = 12;
+                length = 7;
+                r0 = 2;
+                r1 = 4;
+                double topY = 0;//Will be changed later
+                double endX = 0;
+                double fixed_step = .3;
+                //Make left pulley quarter ring
+                for(double r = r1-1; r>r0; r-=fixed_step){
+                    for(double th = Math.PI; th< 1.5*Math.PI+fixed_step/r; th += fixed_step/r){
+                        addPhys(new Fixed(), x0 + r*Math.cos(th), y0 + r*Math.sin(th), false);
+                    }
+                }
+                //Make Rope quarter rings
+                for(double th = Math.PI; th< 1.5*Math.PI+1/r1; th += 1/r1){
+                    topY = y0 + r1*Math.sin(th);//10.06056...
+                    endX = x0 + r1*Math.cos(th);
+                    addPhys(new Brick(), endX, topY, true);
+                }
+                Screen.debugShout("topY="+topY+"; y0-r1="+(y0-r1));
+                Screen.debugShout("endX="+endX+"; x0="+x0);
+                double arm_length = 20+2*(endX-x0);
+                //Make right pulley quarter ring
+                for(double r = r1-1; r>r0; r-=fixed_step){
+                    for(double th = 2*Math.PI; th> 1.5*Math.PI-fixed_step/r; th -= fixed_step/r){
+                        addPhys(new Fixed(), x0 + arm_length + r*Math.cos(th), y0 + r*Math.sin(th), false);
+                    }
+                }
+                for(double th = 2*Math.PI; th> 1.5*Math.PI-1/r1; th -= 1/r1){
+                    addPhys(new Brick(), x0 + arm_length + r1*Math.cos(th), y0 + r1*Math.sin(th), true);
+                }
+                //Make horizontal part of rope
+                for(double x = endX+1; x< endX-2+arm_length; x++){
+                    addPhys(new Brick(), x, topY, true);// switch for topY
+                }
+                //Make vertical part of rope
+                for(double y = y0+1; y< y0+length; y++){
+                    addPhys(new Brick(), x0 - r1, y, true);
+                    //Shift so it lines up with the curved bit
+                    addPhys(new Brick(), x0 + r1 + arm_length, y, true);
+                }
+                //Make weight
+                for(double y = y0+length; y < y0+length+5; y++){
+                    addPhys(new Brick(), x0 - r1, y, true);
+                    addPhys(new Brick(), x0 - r1-Math.sqrt(3)/2, y+ .5, true);
+                    addPhys(new Brick(), x0 - r1+Math.sqrt(3)/2, y+ .5, true);
+                }
+                //Make second, heavier weight
+                for(double y = y0+length; y < y0+length+6; y++){
+                    addPhys(new Brick(), x0 + arm_length + r1, y, true);
+                    addPhys(new Brick(), x0 + arm_length + r1-Math.sqrt(3)/2, y+ .5, true);
+                    addPhys(new Brick(), x0 + arm_length + r1+Math.sqrt(3)/2, y+ .5, true);
+                    addPhys(new Brick(), x0 + arm_length + r1-Math.sqrt(3), y, true);
+                    addPhys(new Brick(), x0 + arm_length + r1+Math.sqrt(3), y, true);
+                }
+                
+                break;
             case "Liquid":
                 //Make globe for gas
                 double r = 10;

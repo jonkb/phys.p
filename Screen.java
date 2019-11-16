@@ -27,7 +27,8 @@ MouseWheelListener, MouseListener, MouseMotionListener {
     public int frameCount = 1;
     public int subFrameCount = 0;
     public boolean a = false; 
-    public byte paused = 0; 
+    //public byte paused = 0;
+    public final boolean startPaused = false;
     
     public boolean onScreen;
     public static boolean recording = false;

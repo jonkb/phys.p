@@ -20,13 +20,13 @@ public class Execute{
     private static int 
         endF = 100000,
         filemode_max_frames = 5000,
-        simNum = 6;
-    private static double
-        precision = 2e-4,//1e-5,//.00000005;
-        zoom = 24,
+        simNum = 3;
+    private static double 
+        precision = 5e-6,//1e-5,//.00000005;
+        zoom = 12,
         gravity = 1;
     private static String 
-        SIM = "SandFall",
+        SIM = "Pulley_2",
         saveFile = "Tests/"+SIM+"/"+simNum+".";
     
     /**
@@ -48,60 +48,105 @@ public class Execute{
      * Example: java Execute d0 z2 t512 sSandFall
      */
     public static void main(String[] args){
-        for(String s: args){
-            String tag = s.substring(0,1);
-            String body = s.substring(1);
+        ArrayList<ArrayList<String>> parsed_args = parse_args(args);
+        for(ArrayList<String> option: parsed_args){
+            String tag = option.get(0);
             switch(tag){
                 case "h":
+                case "-help":
                     //Help
-                    help(body);
+                    help(option);
                     return;
                 case "l":
-                    //load
-                    load(body);
+                case "-load":
+                    if(option.size() < 2){
+                        System.out.println("Must supply a filename to use the load option");
+                        return;
+                    }
+                    load(option.get(1));
                     return;
                 case "v":
-                    //preview
-                    preview(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply a filename to use the view option");
+                        return;
+                    }
+                    preview(option.get(1));
                     return;
                 case "d":
-                    debugging = Integer.parseInt(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply a debugging level");
+                        return;
+                    }
+                    debugging = Integer.parseInt(option.get(1));
                     break;
                 case "z":
-                    zoom = Integer.parseInt(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply a zoom level");
+                        return;
+                    }
+                    zoom = Integer.parseInt(option.get(1));
                     break;
                 case "p":
-                    if(body.equals("l"))
+                    if(option.size() < 2){
+                        System.out.println("Must supply a precision level");
+                        return;
+                    }
+                    if(option.get(1).equals("l"))
                         loadPre = true;
                     else
-                        precision = Double.parseDouble(body);
+                        precision = Double.parseDouble(option.get(1));
                     break;
                 case "i":
-                    switch(body){
-                        case "":
-                            fileMode = false;
-                            break;
-                        case "step":
-                        case "s":
+                    if(option.size() > 1){
+                        if(option.get(1).equals("step") || option.get(1).equals("s")){
                             stepWise = true;
+                        }
+                    }
+                    else{
+                        fileMode = false;
                     }
                     break;
                 case "t":
-                    max_threads = Integer.parseInt(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply a max thread number");
+                        return;
+                    }
+                    max_threads = Integer.parseInt(option.get(1));
                     break;
                 case "n":
-                    simNum = Integer.parseInt(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply the sim number");
+                        return;
+                    }
+                    simNum = Integer.parseInt(option.get(1));
                     break;
                 case "e":
-                    endF = Integer.parseInt(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply the end frame number");
+                        return;
+                    }
+                    endF = Integer.parseInt(option.get(1));
                     break;
                 case "s":
-                    SIM = body;
+                    if(option.size() < 2){
+                        System.out.println("Must supply the sim name");
+                        return;
+                    }
+                    SIM = option.get(1);
                     break;
                 case "g":
-                    gravity = Double.parseDouble(body);
+                    if(option.size() < 2){
+                        System.out.println("Must supply the gravity level");
+                        return;
+                    }
+                    gravity = Double.parseDouble(option.get(1));
+                    break;
+                default:
+                    System.out.println("Unknown CLI argument");
+                    return;
             }
         }
+        
         saveFile = "Tests/"+SIM+"/"+simNum+".";
         t0 = System.currentTimeMillis();
         System.gc();
@@ -119,39 +164,68 @@ public class Execute{
         if(!fileMode){
             JFrame frame = new JFrame("Particles");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            
             frame.getContentPane().add(screen);
             frame.pack();
             frame.setVisible(true);
         }
     }
+    //Parse the cli args to a list of lists
+    private static ArrayList<ArrayList<String>> parse_args(String[] args){
+        //Usually there will probably be less than 4 options at a time
+        ArrayList<ArrayList<String>> parsed_args = new ArrayList<ArrayList<String>>(4);
+        int option_n = -1; //index of current option
+        for(String s: args){
+            if(s.substring(0,1).equals("-")){
+                ArrayList<String> option = new ArrayList<String>(4);
+                option.add(s.substring(1));
+                parsed_args.add(option);
+                option_n++;
+            }
+            //Ignores an argument before the first hyphen
+            //Should I change that?
+            else if(option_n > -1){
+                parsed_args.get(option_n).add(s);
+            }
+        }
+        return parsed_args;
+    }
     //Print a help message for the CLI
-    private static void help(String body){
+    private static void help(ArrayList<String> args){
+        assert args.get(0).equals("h") || args.get(0).equals("-help"): "help called not by a help argument";
+        //support multiple word help requests
+        String body = "";
+        for(int i = 1; i<args.size(); i++){
+            body = body.concat(args.get(i));
+        }
+        System.out.print("Printing help message");
+        if(body.length() > 0)
+            System.out.print(" for "+body+":\n");
+        else
+            System.out.print(":\n");
         switch(body){
             case "":
-            case "elp":
-                System.out.println("Each option for phys.p is specified with a one character tag that may be followed by some modifier or argument.");
+                System.out.println("Each option for phys.p is specified with a one character tag "
+                    +"that may be followed by one modifier or argument.");//For now
                 System.out.println("Options:");
-                System.out.println("\td# - debugging");
-                System.out.println("\tz# - zoom");
-                System.out.println("\tp# - precision");
-                System.out.println("\tpl - load precision (use with l[])");
-                System.out.println("\ti - interactive mode");
-                System.out.println("\tistep - stepwise mode");
-                System.out.println("\tt# - threads");
-                System.out.println("\tg# - gravity (default 1)");
-                System.out.println("\tn# - sim number. Shows up in file names.");
-                System.out.println("\te# - end frame");
-                System.out.println("\ts[string] - SIM name for loading an automatic sim");
+                System.out.println("\t-d #      \tdebugging");
+                System.out.println("\t-z #      \tzoom");
+                System.out.println("\t-p #      \tprecision");
+                System.out.println("\t-p l      \tload precision (use with -l)");
+                System.out.println("\t-i        \tinteractive mode");
+                System.out.println("\t-i step   \tstepwise mode");
+                System.out.println("\t-t #      \tnumber of threads");
+                System.out.println("\t-g #      \tgravity (default 1)");
+                System.out.println("\t-n #      \tsim number. Shows up in file names.");
+                System.out.println("\t-e #      \tend frame");
+                System.out.println("\t-s [string]\tSIM name for loading an automatic sim");
                 System.out.println("Other Commands:");
-                System.out.println("\th - help");
-                System.out.println("\th[option] - help for a particular option (not all listed)");
-                System.out.println("\tl[file] - load and continue .phys");
-                System.out.println("\tv[file] - load and preview .phys");
+                System.out.println("\t-h        \thelp");
+                System.out.println("\t--help    \thelp");
+                System.out.println("\t-h [option]\thelp for a particular option");
+                System.out.println("\t-l [file] \tload and continue .phys");
+                System.out.println("\t-v [file] \tload and preview .phys");
                 break;
             case "s":
-            case "elpsim":
-            case "elpsims":
             case "sim":
             case "sims":
                 System.out.println("SIMS:");
@@ -165,11 +239,43 @@ public class Execute{
                 break;
             case "d"://Help with the "d" option
             case "d#":
-                System.out.println("This option specifies the depth of debugging, A.K.A. how many messages appear during the simulation.");
+            case "d #":
+                System.out.println("This option specifies the depth of debugging, "+
+                    "A.K.A. how many messages appear during the simulation.");
                 System.out.println("\t0: just a few messages");
                 System.out.println("\t1: a few each frame");
                 System.out.println("\t2: lots");
                 System.out.println("\t3: stupid lots");
+                break;
+            case "p":
+                System.out.println("Set the precision of the simulation. This number is the max"+
+                    " distance that the fastest particle can travel without re-calculating forces.");
+                System.out.println("A precision of .1, for example, means that the maximum distance "+
+                    "that a particle can travel inbetween subframes is .1 cells.");
+                System.out.println("If the fastest particle is traveling at 10 cells / frame, "+
+                    "then with p=.1, 100 subframes will be calculated.");
+                System.out.println("Smaller p means more subframes and more precision. "+
+                    "1e-4 is often enough, even for linked particles to stay linked.");
+                break;
+            case "pl":
+            case "p l":
+                System.out.println("If '-p l' is specified, the precision will automatically "+
+                    "be set the same as it was in the file that is being loaded.");
+                System.out.println("Only works when used together with the -l [file] command");
+                break;
+            case "v":
+            case "v[file]":
+            case "v [file]":
+                System.out.println("Loads the specified .phys file, but not to continue the simulation, "+
+                    "rather this command serves to save a .png snapshot of the given .phys file.");
+                break;
+            case "t":
+            case "t#":
+            case "t #":
+                System.out.println("Sets the max number of threads for multithreading.");
+                System.out.println("The default is 1 (no multithreading)");
+                System.out.println("If t=0, that allows for unlimited multithreading, "+
+                    "which creates one thread per particle. CAUTION");
         }
     }
     
@@ -229,15 +335,19 @@ public class Execute{
             precision = d.precision;
         zoom = d.zoom;
         saveFile = d.saveFile;
-        screen.frameCount = d.frame;
-        screen.subFrameCount = d.subframe;
         SIM = "";
+        screen = new Screen(endF, precision, saveFile, SIM, zoom, false);
+        screen.frameCount = d.frame;
+        screen.subFrameCount = 0;
+        //BROKEN: d.subframe; 
+        //At present, it doesn't reset the subframes to 0 until after saving the .phys file.
+        //If you try to start on a frame with d.subframe, it'll start out at subframe 1000/1100 for example
+        //If you wish to continue in the middle of a frame, uncomment. For now it's a bit broken.
         
         assert d.particles != null: d.particles;
         System.out.println("loading "+d.particles.length+ " particles");
         //+" starting with "+d.particles[0]+": a "+d.particles[0].type
         //+" @ x= "+d.particles[0].X);
-        screen = new Screen(endF, precision, saveFile, SIM, zoom, false);
         for(Data.pData pd: d.particles) {
             assert pd != null;
             assert pd.type != null;
